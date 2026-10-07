@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="Compra_DAL.cs" />
+    <None Include="Det_Ctrl_Iventario_DAL.cs" />
+    <None Include="Estado_Pedido_DAL.cs" />
+  </ItemGroup>
+
+</Project>

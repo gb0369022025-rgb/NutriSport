@@ -1,4 +1,6 @@
 <Solution>
-  <Project Path="Entities/Entities.csproj" />
-  <Project Path="View/View.csproj" />
+  <Project Path="BL/NutriSport.BL.csproj" />
+  <Project Path="DALL/NutriSport.DAL.csproj" />
+  <Project Path="Entities/NutriSport.Entities.csproj" />
+  <Project Path="View/NutriSport.View.csproj" />
 </Solution>
