@@ -12,4 +12,9 @@
     <None Include="Estado_Pedido_DAL.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Entities\NutriSport.Entities.csproj" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.7" />
+  </ItemGroup>
+
 </Project>

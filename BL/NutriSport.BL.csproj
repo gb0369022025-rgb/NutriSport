@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Entities\NutriSport.Entities.csproj" />
+    <ProjectReference Include="..\DALL\NutriSport.DAL.csproj" />
+  </ItemGroup>
+
 </Project>
