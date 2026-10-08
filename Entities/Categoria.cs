@@ -4,7 +4,10 @@ using System.Text;
 
 namespace NutriSport.Entities
 {
-    internal class Categoria
-    {
-    }
+	public class Categoria
+	{
+		public int CategoriaId { get; set; }
+		public string NombreCategoria { get; set; } = string.Empty;
+		public int Estado { get; set; } = 1;
+	}
 }

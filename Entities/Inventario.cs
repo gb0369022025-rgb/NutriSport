@@ -4,7 +4,10 @@ using System.Text;
 
 namespace NutriSport.Entities
 {
-    internal class Inventario
-    {
-    }
+	public class Inventario
+	{
+		public int InventarioId { get; set; }
+		public int Existencias { get; set; }
+		public DateTime FechaActualizacion { get; set; }
+	}
 }

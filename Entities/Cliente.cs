@@ -4,7 +4,14 @@ using System.Text;
 
 namespace NutriSport.Entities
 {
-    internal class Cliente
-    {
-    }
+	public class Cliente
+	{
+		public int ClienteId { get; set; }
+		public string? Nombre { get; set; }
+		public string? Apellido { get; set; }
+		public string? Telefono { get; set; }
+		public string? Email { get; set; }
+		public string? DUI { get; set; }
+		public int Estado { get; set; } = 1;
+	}
 }

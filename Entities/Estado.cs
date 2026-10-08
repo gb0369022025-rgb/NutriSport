@@ -4,10 +4,9 @@ using System.Text;
 
 namespace NutriSport.Entities
 {
-	public class Cargo
+	public class Estado
 	{
-		public short CargoId { get; set; }
+		public int EstadoId { get; set; }
 		public string Nombre { get; set; } = string.Empty;
-		public int Estado { get; set; } = 1;
 	}
 }
