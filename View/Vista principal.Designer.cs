@@ -152,6 +152,7 @@
             btnClientes.Text = "Clientes";
             btnClientes.TextAlign = ContentAlignment.MiddleLeft;
             btnClientes.UseVisualStyleBackColor = true;
+            btnClientes.Click += btnClientes_Click;
             // 
             // btnVentas
             // 
@@ -166,6 +167,7 @@
             btnVentas.Text = "Ventas";
             btnVentas.TextAlign = ContentAlignment.MiddleLeft;
             btnVentas.UseVisualStyleBackColor = true;
+            btnVentas.Click += btnVentas_Click;
             // 
             // btnPedidos
             // 
@@ -180,6 +182,7 @@
             btnPedidos.Text = "Pedidos";
             btnPedidos.TextAlign = ContentAlignment.MiddleLeft;
             btnPedidos.UseVisualStyleBackColor = true;
+            btnPedidos.Click += btnPedidos_Click;
             // 
             // lblCatInventario
             // 
@@ -204,6 +207,7 @@
             btnCategorias.Text = "Categorías";
             btnCategorias.TextAlign = ContentAlignment.MiddleLeft;
             btnCategorias.UseVisualStyleBackColor = true;
+            btnCategorias.Click += btnCategorias_Click;
             // 
             // btnControlInventario
             // 
@@ -218,6 +222,7 @@
             btnControlInventario.Text = "Control Inventario";
             btnControlInventario.TextAlign = ContentAlignment.MiddleLeft;
             btnControlInventario.UseVisualStyleBackColor = true;
+            btnControlInventario.Click += btnControlInventario_Click;
             // 
             // btnProductos
             // 
@@ -232,6 +237,7 @@
             btnProductos.Text = "Productos";
             btnProductos.TextAlign = ContentAlignment.MiddleLeft;
             btnProductos.UseVisualStyleBackColor = true;
+            btnProductos.Click += btnProductos_Click;
             // 
             // lblCatOperaciones
             // 
@@ -256,6 +262,7 @@
             btnCompras.Text = "Compras";
             btnCompras.TextAlign = ContentAlignment.MiddleLeft;
             btnCompras.UseVisualStyleBackColor = true;
+            btnCompras.Click += btnCompras_Click;
             // 
             // btnProveedores
             // 
@@ -270,6 +277,7 @@
             btnProveedores.Text = "Proveedores";
             btnProveedores.TextAlign = ContentAlignment.MiddleLeft;
             btnProveedores.UseVisualStyleBackColor = true;
+            btnProveedores.Click += btnProveedores_Click;
             // 
             // lblCatAdmin
             // 
@@ -308,6 +316,7 @@
             btnUsuarios.Text = "Usuarios";
             btnUsuarios.TextAlign = ContentAlignment.MiddleLeft;
             btnUsuarios.UseVisualStyleBackColor = true;
+            btnUsuarios.Click += btnUsuarios_Click;
             // 
             // lblUsuario
             // 
