@@ -19,7 +19,6 @@ namespace NutriSport.DAL
                     {
                         while (reader.Read())
                         {
-                            // 'Categoria' viene como "Código - Nombre"
                             string categoria = reader["Categoria"].ToString() ?? string.Empty;
 
                             lista.Add(new Producto

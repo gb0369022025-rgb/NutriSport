@@ -19,7 +19,6 @@ namespace NutriSport.DAL
                     {
                         while (reader.Read())
                         {
-                            // 'Cliente' viene como "Código - Nombre Apellido" (NULL si la venta no tiene cliente)
                             string cliente = reader["Cliente"] != DBNull.Value ? reader["Cliente"].ToString() ?? string.Empty : string.Empty;
 
                             lista.Add(new Venta

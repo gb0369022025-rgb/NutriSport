@@ -19,7 +19,6 @@ namespace NutriSport.DAL
                     {
                         while (reader.Read())
                         {
-                            // 'Proveedor' y 'Usuario' vienen como "Código - Nombre"
                             string proveedor = reader["Proveedor"].ToString() ?? string.Empty;
                             string usuario = reader["Usuario"].ToString() ?? string.Empty;
 

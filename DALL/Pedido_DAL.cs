@@ -36,7 +36,6 @@ namespace NutriSport.DAL
         {
             using (var conn = BDComun.ObtenerConexion())
             {
-                // La fecha la asigna el procedimiento con getdate()
                 using (var cmd = BDComun.ObtenerComando("SpInsertPedido", conn))
                 {
                     cmd.Parameters.AddWithValue("@NumeroPedido", (object?)entidad.NumeroPedido ?? DBNull.Value);

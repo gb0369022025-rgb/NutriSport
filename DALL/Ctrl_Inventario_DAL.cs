@@ -19,7 +19,6 @@ namespace NutriSport.DAL
                     {
                         while (reader.Read())
                         {
-                            // 'Usuario' viene como "Código - Nombre"
                             string usuario = reader["Usuario"].ToString() ?? string.Empty;
 
                             lista.Add(new Ctrl_Inventario

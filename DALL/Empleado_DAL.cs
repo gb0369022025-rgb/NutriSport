@@ -18,7 +18,6 @@ namespace NutriSport.DAL
                     {
                         while (reader.Read())
                         {
-                            // 'Rol' y 'Cargo' vienen como "Código - Nombre"
                             string rol = reader["Rol"].ToString() ?? string.Empty;
                             string cargo = reader["Cargo"].ToString() ?? string.Empty;
 
