@@ -252,7 +252,7 @@
             // colCodigo
             // 
             colCodigo.DataPropertyName = "CategoriaId";
-            colCodigo.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colCodigo.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colCodigo.FillWeight = 40F;
             colCodigo.HeaderText = "Código";
             colCodigo.MinimumWidth = 6;

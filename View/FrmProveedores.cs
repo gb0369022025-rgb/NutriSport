@@ -13,26 +13,41 @@ namespace View
             dgvProveedores.AutoGenerateColumns = false;
         }
 
-        private void FrmProveedores_Load(object sender, EventArgs e)
+        private async void FrmProveedores_Load(object sender, EventArgs e)
         {
-            CargarProveedores();
+            await CargarProveedoresAsync();
             LimpiarCampos();
         }
 
-        private void CargarProveedores()
+        // Las consultas se hacen en segundo plano para que la ventana no se congele mientras responde la BD
+        private async Task CargarProveedoresAsync()
         {
+            MostrarOcupado(true, "Cargando proveedores...");
             try
             {
-                List<Proveedor> proveedores = Proveedor_BL.ObtenerTodos();
+                List<Proveedor> proveedores = await Task.Run(() => Proveedor_BL.ObtenerTodos());
+                if (IsDisposed) return;
                 dgvProveedores.DataSource = proveedores;
                 lblEstado.Text = proveedores.Count == 1 ? "1 proveedor registrado" : $"{proveedores.Count} proveedores registrados";
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 lblEstado.Text = "Sin conexión con la base de datos";
                 MessageBox.Show("No se pudo cargar la lista de proveedores. Revisa la conexión con la base de datos.\n\nDetalle: " + ex.Message,
                     Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+        }
+
+        private void MostrarOcupado(bool ocupado, string? mensaje = null)
+        {
+            panelDatos.Enabled = !ocupado;
+            UseWaitCursor = ocupado;
+            if (mensaje != null) lblEstado.Text = mensaje;
         }
 
         private bool ValidarCampos()
@@ -61,33 +76,40 @@ namespace View
             txtNombre.Focus();
         }
 
-        private void btnAgregar_Click(object sender, EventArgs e)
+        private async void btnAgregar_Click(object sender, EventArgs e)
         {
             if (!ValidarCampos()) return;
 
+            var proveedor = new Proveedor
+            {
+                Nombre = txtNombre.Text.Trim(),
+                Direccion = txtDireccion.Text.Trim(),
+                Telefono = string.IsNullOrWhiteSpace(txtTelefono.Text) ? null : txtTelefono.Text.Trim()
+            };
+            MostrarOcupado(true, "Guardando...");
             try
             {
-                var proveedor = new Proveedor
-                {
-                    Nombre = txtNombre.Text.Trim(),
-                    Direccion = txtDireccion.Text.Trim(),
-                    Telefono = string.IsNullOrWhiteSpace(txtTelefono.Text) ? null : txtTelefono.Text.Trim()
-                };
-                int filas = Proveedor_BL.Agregar(proveedor);
+                int filas = await Task.Run(() => Proveedor_BL.Agregar(proveedor));
+                if (IsDisposed) return;
                 if (filas > 0)
                 {
                     MessageBox.Show("Proveedor agregado.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await CargarProveedoresAsync();
                     LimpiarCampos();
-                    CargarProveedores();
                 }
                 else
                 {
-                    MessageBox.Show("No se agregó el proveedor. Intenta de nuevo.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Ya existe un proveedor con ese nombre.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 MessageBox.Show("No se pudo agregar el proveedor.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
             }
         }
 

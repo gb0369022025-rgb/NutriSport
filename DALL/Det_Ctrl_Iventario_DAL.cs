@@ -12,8 +12,7 @@ namespace NutriSport.DAL
             var lista = new List<Det_Ctrl_Iventario>();
             using (var conn = BDComun.ObtenerConexion())
             {
-                string query = "SELECT DetControlInvId, Cantidad, Observacion, NombreControlInv FROM DET_CTRL_INVENTARIO";
-                using (var cmd = new SqlCommand(query, conn))
+                using (var cmd = BDComun.ObtenerComando("SpSelectAllDetControlInv", conn))
                 {
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -21,10 +20,10 @@ namespace NutriSport.DAL
                         {
                             lista.Add(new Det_Ctrl_Iventario
                             {
-                                DetControlInvId = Convert.ToInt32(reader["DetControlInvId"]),
+                                DetControlInvId = Convert.ToInt32(reader["Código"]),
                                 Cantidad = Convert.ToInt32(reader["Cantidad"]),
-                                Observacion = reader["Observacion"].ToString() ?? string.Empty,
-                                NombreControlInv = reader["NombreControlInv"] != DBNull.Value ? Convert.ToInt32(reader["NombreControlInv"]) : null
+                                Observacion = reader["Observación"].ToString() ?? string.Empty,
+                                NombreControlInv = reader["Código Control"] != DBNull.Value ? Convert.ToInt32(reader["Código Control"]) : null
                             });
                         }
                     }
@@ -37,9 +36,7 @@ namespace NutriSport.DAL
         {
             using (var conn = BDComun.ObtenerConexion())
             {
-                string query = "INSERT INTO DET_CTRL_INVENTARIO (Cantidad, Observacion, NombreControlInv) " +
-                               "VALUES (@Cantidad, @Observacion, @NombreControlInv)";
-                using (var cmd = new SqlCommand(query, conn))
+                using (var cmd = BDComun.ObtenerComando("SpInsertDetControlInv", conn))
                 {
                     cmd.Parameters.AddWithValue("@Cantidad", entidad.Cantidad);
                     cmd.Parameters.AddWithValue("@Observacion", entidad.Observacion);

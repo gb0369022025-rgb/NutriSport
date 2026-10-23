@@ -13,20 +13,22 @@ namespace NutriSport.DAL
             var lista = new List<Venta>();
             using (var conn = BDComun.ObtenerConexion())
             {
-                string query = "SELECT IdVenta, FechaVenta, Estado, Descripcion, ClienteId FROM VENTA";
-                using (var cmd = new SqlCommand(query, conn))
+                using (var cmd = BDComun.ObtenerComando("SpSelectAllVenta", conn))
                 {
                     using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
+                            // 'Cliente' viene como "Código - Nombre Apellido" (NULL si la venta no tiene cliente)
+                            string cliente = reader["Cliente"] != DBNull.Value ? reader["Cliente"].ToString() ?? string.Empty : string.Empty;
+
                             lista.Add(new Venta
                             {
-                                IdVenta = Convert.ToInt32(reader["IdVenta"]),
-                                FechaVenta = Convert.ToDateTime(reader["FechaVenta"]),
+                                IdVenta = Convert.ToInt32(reader["Código Venta"]),
+                                FechaVenta = Convert.ToDateTime(reader["Fecha"]),
                                 Estado = reader["Estado"].ToString() ?? string.Empty,
-                                Descripcion = reader["Descripcion"].ToString() ?? string.Empty,
-                                ClienteId = reader["ClienteId"] != DBNull.Value ? Convert.ToInt32(reader["ClienteId"]) : null
+                                Descripcion = reader["Descripción"].ToString() ?? string.Empty,
+                                ClienteId = cliente.Contains(" - ") ? Convert.ToInt32(cliente.Substring(0, cliente.IndexOf(" - "))) : null
                             });
                         }
                     }
@@ -39,13 +41,13 @@ namespace NutriSport.DAL
         {
             using (var conn = BDComun.ObtenerConexion())
             {
-                string query = "INSERT INTO VENTA (FechaVenta, Estado, Descripcion, ClienteId) VALUES (@FechaVenta, @Estado, @Descripcion, @ClienteId)";
-                using (var cmd = new SqlCommand(query, conn))
+                using (var cmd = BDComun.ObtenerComando("SpInsertVenta", conn))
                 {
                     cmd.Parameters.AddWithValue("@FechaVenta", entidad.FechaVenta);
                     cmd.Parameters.AddWithValue("@Estado", entidad.Estado);
                     cmd.Parameters.AddWithValue("@Descripcion", entidad.Descripcion);
                     cmd.Parameters.AddWithValue("@ClienteId", (object?)entidad.ClienteId ?? DBNull.Value);
+                    cmd.Parameters.Add(new SqlParameter("@IdVentaGenerado", SqlDbType.Int) { Direction = ParameterDirection.Output });
                     return cmd.ExecuteNonQuery();
                 }
             }

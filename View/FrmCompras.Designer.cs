@@ -374,7 +374,7 @@
             // colCodigo
             // 
             colCodigo.DataPropertyName = "CompraId";
-            colCodigo.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colCodigo.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colCodigo.FillWeight = 50F;
             colCodigo.HeaderText = "Código";
             colCodigo.MinimumWidth = 6;
@@ -387,7 +387,7 @@
             dataGridViewCellStyle3.Format = "dd/MM/yyyy HH:mm";
             dataGridViewCellStyle3.NullValue = null;
             colFechaHora.DefaultCellStyle = dataGridViewCellStyle3;
-            colFechaHora.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colFechaHora.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colFechaHora.FillWeight = 95F;
             colFechaHora.HeaderText = "Fecha y hora";
             colFechaHora.MinimumWidth = 6;
@@ -406,7 +406,7 @@
             // colNumFact
             // 
             colNumFact.DataPropertyName = "NumFact";
-            colNumFact.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colNumFact.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colNumFact.FillWeight = 65F;
             colNumFact.HeaderText = "N° factura";
             colNumFact.MinimumWidth = 6;
@@ -429,7 +429,7 @@
             dataGridViewCellStyle4.Format = "$#,##0.00";
             dataGridViewCellStyle4.NullValue = null;
             colSubTotal.DefaultCellStyle = dataGridViewCellStyle4;
-            colSubTotal.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colSubTotal.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colSubTotal.FillWeight = 70F;
             colSubTotal.HeaderText = "Subtotal";
             colSubTotal.MinimumWidth = 6;
@@ -443,7 +443,7 @@
             dataGridViewCellStyle5.Format = "$#,##0.00";
             dataGridViewCellStyle5.NullValue = null;
             colTotalPagar.DefaultCellStyle = dataGridViewCellStyle5;
-            colTotalPagar.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colTotalPagar.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colTotalPagar.FillWeight = 70F;
             colTotalPagar.HeaderText = "Total";
             colTotalPagar.MinimumWidth = 6;
@@ -453,7 +453,7 @@
             // colEstado
             // 
             colEstado.DataPropertyName = "Estado";
-            colEstado.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colEstado.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colEstado.FillWeight = 70F;
             colEstado.HeaderText = "Estado";
             colEstado.MinimumWidth = 6;

@@ -13,8 +13,7 @@ namespace NutriSport.DAL
             var lista = new List<Cargo>();
             using (var conn = BDComun.ObtenerConexion())
             {
-                string query = "SELECT CargoId, Nombre, Estado FROM CARGO WHERE Estado = 1";
-                using (var cmd = new SqlCommand(query, conn))
+                using (var cmd = BDComun.ObtenerComando("SpSelectAllCargo", conn))
                 {
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -22,9 +21,8 @@ namespace NutriSport.DAL
                         {
                             lista.Add(new Cargo
                             {
-                                CargoId = Convert.ToInt16(reader["CargoId"]),
-                                Nombre = reader["Nombre"].ToString() ?? string.Empty,
-                                Estado = Convert.ToInt32(reader["Estado"])
+                                CargoId = Convert.ToInt16(reader["Código"]),
+                                Nombre = reader["Cargo"].ToString() ?? string.Empty
                             });
                         }
                     }
@@ -37,11 +35,9 @@ namespace NutriSport.DAL
         {
             using (var conn = BDComun.ObtenerConexion())
             {
-                string query = "INSERT INTO CARGO (Nombre, Estado) VALUES (@Nombre, @Estado)";
-                using (var cmd = new SqlCommand(query, conn))
+                using (var cmd = BDComun.ObtenerComando("SpInsertCargo", conn))
                 {
                     cmd.Parameters.AddWithValue("@Nombre", entidad.Nombre);
-                    cmd.Parameters.AddWithValue("@Estado", entidad.Estado);
                     return cmd.ExecuteNonQuery();
                 }
             }

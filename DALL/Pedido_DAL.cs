@@ -12,8 +12,7 @@ namespace NutriSport.DAL
             var lista = new List<Pedido>();
             using (var conn = BDComun.ObtenerConexion())
             {
-                string query = "SELECT PedidoId, NumeroPedido, Fecha, Estado FROM PEDIDO";
-                using (var cmd = new SqlCommand(query, conn))
+                using (var cmd = BDComun.ObtenerComando("SpSelectAllPedido", conn))
                 {
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -21,9 +20,9 @@ namespace NutriSport.DAL
                         {
                             lista.Add(new Pedido
                             {
-                                PedidoId = Convert.ToInt32(reader["PedidoId"]),
-                                NumeroPedido = reader["NumeroPedido"] != DBNull.Value ? Convert.ToInt32(reader["NumeroPedido"]) : null,
-                                Fecha = reader["Fecha"] != DBNull.Value ? Convert.ToDateTime(reader["Fecha"]) : null,
+                                PedidoId = Convert.ToInt32(reader["Código"]),
+                                NumeroPedido = reader["N° Pedido"] != DBNull.Value ? Convert.ToInt32(reader["N° Pedido"]) : null,
+                                Fecha = reader["Fecha Registro"] != DBNull.Value ? Convert.ToDateTime(reader["Fecha Registro"]) : null,
                                 Estado = reader["Estado"].ToString() ?? "Pendiente"
                             });
                         }
@@ -37,11 +36,10 @@ namespace NutriSport.DAL
         {
             using (var conn = BDComun.ObtenerConexion())
             {
-                string query = "INSERT INTO PEDIDO (NumeroPedido, Fecha, Estado) VALUES (@NumeroPedido, @Fecha, @Estado)";
-                using (var cmd = new SqlCommand(query, conn))
+                // La fecha la asigna el procedimiento con getdate()
+                using (var cmd = BDComun.ObtenerComando("SpInsertPedido", conn))
                 {
                     cmd.Parameters.AddWithValue("@NumeroPedido", (object?)entidad.NumeroPedido ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@Fecha", (object?)entidad.Fecha ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@Estado", entidad.Estado);
                     return cmd.ExecuteNonQuery();
                 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using Microsoft.Data.SqlClient;
 using Entities;
 
@@ -13,25 +12,27 @@ namespace NutriSport.DAL
             var lista = new List<Empleado>();
             using (var conn = BDComun.ObtenerConexion())
             {
-                string query = "SELECT EmpleadoId, Nombre, Apellido, Telefono, Email, DUI, Direccion, RolId, CargoId, Estado FROM EMPLEADO";
-                using (var cmd = new SqlCommand(query, conn))
+                using (var cmd = BDComun.ObtenerComando("SpSelectAllEmpleado", conn))
                 {
                     using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
+                            // 'Rol' y 'Cargo' vienen como "Código - Nombre"
+                            string rol = reader["Rol"].ToString() ?? string.Empty;
+                            string cargo = reader["Cargo"].ToString() ?? string.Empty;
+
                             lista.Add(new Empleado
                             {
-                                EmpleadoId = Convert.ToInt32(reader["EmpleadoId"]),
+                                EmpleadoId = Convert.ToInt32(reader["Código"]),
                                 Nombre = reader["Nombre"].ToString() ?? string.Empty,
                                 Apellido = reader["Apellido"].ToString() ?? string.Empty,
-                                Telefono = reader["Telefono"].ToString() ?? string.Empty,
-                                Email = reader["Email"].ToString() ?? string.Empty,
+                                Telefono = reader["Teléfono"].ToString() ?? string.Empty,
+                                Email = reader["Correo"].ToString() ?? string.Empty,
                                 DUI = reader["DUI"].ToString() ?? string.Empty,
-                                Direccion = reader["Direccion"].ToString() ?? string.Empty,
-                                RolId = Convert.ToInt16(reader["RolId"]),
-                                CargoId = Convert.ToInt16(reader["CargoId"]),
-                                Estado = Convert.ToInt32(reader["Estado"])
+                                Direccion = reader["Dirección"].ToString() ?? string.Empty,
+                                RolId = Convert.ToInt16(rol.Substring(0, rol.IndexOf(" - "))),
+                                CargoId = Convert.ToInt16(cargo.Substring(0, cargo.IndexOf(" - ")))
                             });
                         }
                     }
@@ -44,9 +45,7 @@ namespace NutriSport.DAL
         {
             using (var conn = BDComun.ObtenerConexion())
             {
-                string query = "INSERT INTO EMPLEADO (Nombre, Apellido, Telefono, Email, DUI, Direccion, RolId, CargoId, Estado) " +
-                               "VALUES (@Nombre, @Apellido, @Telefono, @Email, @DUI, @Direccion, @RolId, @CargoId, @Estado)";
-                using (var cmd = new SqlCommand(query, conn))
+                using (var cmd = BDComun.ObtenerComando("SpInsertEmpleado", conn))
                 {
                     cmd.Parameters.AddWithValue("@Nombre", entidad.Nombre);
                     cmd.Parameters.AddWithValue("@Apellido", entidad.Apellido);
@@ -56,7 +55,6 @@ namespace NutriSport.DAL
                     cmd.Parameters.AddWithValue("@Direccion", entidad.Direccion);
                     cmd.Parameters.AddWithValue("@RolId", entidad.RolId);
                     cmd.Parameters.AddWithValue("@CargoId", entidad.CargoId);
-                    cmd.Parameters.AddWithValue("@Estado", entidad.Estado);
                     return cmd.ExecuteNonQuery();
                 }
             }

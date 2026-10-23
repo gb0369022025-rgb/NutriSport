@@ -12,8 +12,7 @@ namespace NutriSport.DAL
             var lista = new List<Estado>();
             using (var conn = BDComun.ObtenerConexion())
             {
-                string query = "SELECT EstadoId, Nombre FROM ESTADO";
-                using (var cmd = new SqlCommand(query, conn))
+                using (var cmd = BDComun.ObtenerComando("SpSelectAllEstado", conn))
                 {
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -21,8 +20,8 @@ namespace NutriSport.DAL
                         {
                             lista.Add(new Estado
                             {
-                                EstadoId = Convert.ToInt32(reader["EstadoId"]),
-                                Nombre = reader["Nombre"].ToString() ?? string.Empty
+                                EstadoId = Convert.ToInt32(reader["Código"]),
+                                Nombre = reader["Estado"].ToString() ?? string.Empty
                             });
                         }
                     }

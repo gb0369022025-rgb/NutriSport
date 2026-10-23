@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using Microsoft.Data.SqlClient;
 using NutriSport.Entities;
 
@@ -12,20 +13,22 @@ namespace NutriSport.DAL
             var lista = new List<Ctrl_Inventario>();
             using (var conn = BDComun.ObtenerConexion())
             {
-                string query = "SELECT ControlInvId, NombreUsuario, FechaHora, CantProducto, Observacion, Estado FROM CTRL_INVENTARIO";
-                using (var cmd = new SqlCommand(query, conn))
+                using (var cmd = BDComun.ObtenerComando("SpSelectAllControlInventario", conn))
                 {
                     using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
+                            // 'Usuario' viene como "Código - Nombre"
+                            string usuario = reader["Usuario"].ToString() ?? string.Empty;
+
                             lista.Add(new Ctrl_Inventario
                             {
-                                ControlInvId = Convert.ToInt32(reader["ControlInvId"]),
-                                NombreUsuario = Convert.ToInt32(reader["NombreUsuario"]),
-                                FechaHora = Convert.ToDateTime(reader["FechaHora"]),
-                                CantProducto = Convert.ToInt32(reader["CantProducto"]),
-                                Observacion = reader["Observacion"]?.ToString(),
+                                ControlInvId = Convert.ToInt32(reader["Código Control"]),
+                                NombreUsuario = Convert.ToInt32(usuario.Substring(0, usuario.IndexOf(" - "))),
+                                FechaHora = Convert.ToDateTime(reader["Fecha Hora"]),
+                                CantProducto = Convert.ToInt32(reader["Cantidad Productos"]),
+                                Observacion = reader["Observación"] != DBNull.Value ? reader["Observación"].ToString() : null,
                                 Estado = reader["Estado"].ToString() ?? string.Empty
                             });
                         }
@@ -39,15 +42,14 @@ namespace NutriSport.DAL
         {
             using (var conn = BDComun.ObtenerConexion())
             {
-                string query = "INSERT INTO CTRL_INVENTARIO (NombreUsuario, FechaHora, CantProducto, Observacion, Estado) " +
-                               "VALUES (@NombreUsuario, @FechaHora, @CantProducto, @Observacion, @Estado)";
-                using (var cmd = new SqlCommand(query, conn))
+                using (var cmd = BDComun.ObtenerComando("SpInsertControlInventario", conn))
                 {
                     cmd.Parameters.AddWithValue("@NombreUsuario", entidad.NombreUsuario);
                     cmd.Parameters.AddWithValue("@FechaHora", entidad.FechaHora);
                     cmd.Parameters.AddWithValue("@CantProducto", entidad.CantProducto);
                     cmd.Parameters.AddWithValue("@Observacion", (object?)entidad.Observacion ?? DBNull.Value);
                     cmd.Parameters.AddWithValue("@Estado", entidad.Estado);
+                    cmd.Parameters.Add(new SqlParameter("@ControlInvIdGenerado", SqlDbType.Int) { Direction = ParameterDirection.Output });
                     return cmd.ExecuteNonQuery();
                 }
             }

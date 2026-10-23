@@ -44,7 +44,7 @@ SELECT * FROM CARGO;
 
 INSERT INTO EMPLEADO (Nombre, Apellido, Telefono, Email, DUI, Direccion, RolId, CargoId, Estado) VALUES
 ('Mauricio', 'Zelaya', '7011-2233', 'm.zelaya@nutrisport.sv', '03412567-9', 'Santa Tecla, La Libertad', 3, 1, 1),
-('Sofía', 'Mendoza', '7822-4455', 's.mendoza@nutrisport.sv', '05891234-0', 'Antiguo Cuscatlán, La Libertad', 4, 2, 1);
+('Sofía', 'Mendoza', '7822-4455', 's.mendoza@nutrisport.sv', '05891234-0', 'Antiguo Cuscatlán, La Libertad', 2, 2, 1);
 
 SELECT * FROM EMPLEADO;
 

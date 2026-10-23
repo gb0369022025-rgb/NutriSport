@@ -317,7 +317,7 @@
             // colCodigo
             // 
             colCodigo.DataPropertyName = "UsuarioId";
-            colCodigo.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colCodigo.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colCodigo.FillWeight = 50F;
             colCodigo.HeaderText = "Código";
             colCodigo.MinimumWidth = 6;
@@ -345,7 +345,7 @@
             // colTipo
             // 
             colTipo.DataPropertyName = "Tipo";
-            colTipo.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colTipo.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colTipo.FillWeight = 90F;
             colTipo.HeaderText = "Tipo";
             colTipo.MinimumWidth = 6;
@@ -355,7 +355,7 @@
             // colEstado
             // 
             colEstado.DataPropertyName = "Estado";
-            colEstado.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colEstado.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colEstado.FillWeight = 70F;
             colEstado.HeaderText = "Estado";
             colEstado.MinimumWidth = 6;

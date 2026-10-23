@@ -386,7 +386,7 @@
             // colCodigo
             // 
             colCodigo.DataPropertyName = "EmpleadoId";
-            colCodigo.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colCodigo.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colCodigo.FillWeight = 45F;
             colCodigo.HeaderText = "Código";
             colCodigo.MinimumWidth = 6;
@@ -414,7 +414,7 @@
             // colTelefono
             // 
             colTelefono.DataPropertyName = "Telefono";
-            colTelefono.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colTelefono.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colTelefono.FillWeight = 70F;
             colTelefono.HeaderText = "Teléfono";
             colTelefono.MinimumWidth = 6;
@@ -433,7 +433,7 @@
             // colDUI
             // 
             colDUI.DataPropertyName = "DUI";
-            colDUI.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colDUI.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colDUI.FillWeight = 75F;
             colDUI.HeaderText = "DUI";
             colDUI.MinimumWidth = 6;
@@ -452,7 +452,7 @@
             // colRolId
             // 
             colRolId.DataPropertyName = "RolId";
-            colRolId.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colRolId.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colRolId.FillWeight = 35F;
             colRolId.HeaderText = "Rol";
             colRolId.MinimumWidth = 6;
@@ -462,7 +462,7 @@
             // colCargoId
             // 
             colCargoId.DataPropertyName = "CargoId";
-            colCargoId.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colCargoId.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colCargoId.FillWeight = 40F;
             colCargoId.HeaderText = "Cargo";
             colCargoId.MinimumWidth = 6;

@@ -15,74 +15,89 @@ namespace View
             dgvCompras.AutoGenerateColumns = false;
         }
 
-        private void FrmCompras_Load(object sender, EventArgs e)
+        // Proveedores, usuarios y compras se consultan al mismo tiempo, en segundo plano
+        private async void FrmCompras_Load(object sender, EventArgs e)
         {
-            CargarProveedores();
-            CargarUsuarios();
-            CargarCompras();
-            LimpiarCampos();
-        }
-
-        private void CargarProveedores()
-        {
+            MostrarOcupado(true, "Cargando compras...");
             try
             {
-                proveedores = Proveedor_BL.ObtenerTodos();
+                Task<List<Proveedor>> tareaProveedores = Task.Run(() => Proveedor_BL.ObtenerTodos());
+                Task<List<Usuario>> tareaUsuarios = Task.Run(() => Usuario_BL.ObtenerTodos());
+                Task<List<Compra>> tareaCompras = Task.Run(() => Compra_BL.ObtenerTodos());
+                await Task.WhenAll(tareaProveedores, tareaUsuarios, tareaCompras);
+                if (IsDisposed) return;
+
+                proveedores = tareaProveedores.Result;
                 cboProveedor.DataSource = proveedores;
                 cboProveedor.DisplayMember = nameof(Proveedor.Nombre);
                 cboProveedor.ValueMember = nameof(Proveedor.ProveedorId);
-                cboProveedor.SelectedIndex = -1;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("No se pudo cargar la lista de proveedores.\n\nDetalle: " + ex.Message,
-                    Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
 
-        private void CargarUsuarios()
-        {
-            try
-            {
-                usuarios = Usuario_BL.ObtenerTodos();
+                usuarios = tareaUsuarios.Result;
                 cboUsuario.DataSource = usuarios;
                 cboUsuario.DisplayMember = nameof(Usuario.Nombre);
                 cboUsuario.ValueMember = nameof(Usuario.UsuarioId);
-                cboUsuario.SelectedIndex = -1;
+
+                MostrarCompras(tareaCompras.Result);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("No se pudo cargar la lista de usuarios.\n\nDetalle: " + ex.Message,
+                if (IsDisposed) return;
+                lblEstado.Text = "Sin conexión con la base de datos";
+                MessageBox.Show("No se pudieron cargar las compras, proveedores y usuarios. Revisa la conexión con la base de datos.\n\nDetalle: " + ex.Message,
                     Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+            if (!IsDisposed) LimpiarCampos();
         }
 
-        private void CargarCompras()
+        private async Task CargarComprasAsync()
         {
+            MostrarOcupado(true, "Cargando compras...");
             try
             {
-                List<Compra> compras = Compra_BL.ObtenerTodos();
-                dgvCompras.DataSource = compras
-                    .Select(c => new
-                    {
-                        c.CompraId,
-                        c.FechaHora,
-                        Proveedor = proveedores.FirstOrDefault(p => p.ProveedorId == c.NombreProveedor)?.Nombre ?? $"Proveedor {c.NombreProveedor}",
-                        c.NumFact,
-                        Usuario = usuarios.FirstOrDefault(u => u.UsuarioId == c.NombreUsuario)?.Nombre ?? $"Usuario {c.NombreUsuario}",
-                        c.SubTotal,
-                        c.TotalPagar,
-                        c.Estado
-                    })
-                    .ToList();
-                lblEstado.Text = compras.Count == 1 ? "1 compra registrada" : $"{compras.Count} compras registradas";
+                List<Compra> compras = await Task.Run(() => Compra_BL.ObtenerTodos());
+                if (IsDisposed) return;
+                MostrarCompras(compras);
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 lblEstado.Text = "Sin conexión con la base de datos";
                 MessageBox.Show("No se pudo cargar la lista de compras. Revisa la conexión con la base de datos.\n\nDetalle: " + ex.Message,
                     Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+        }
+
+        private void MostrarCompras(List<Compra> compras)
+        {
+            dgvCompras.DataSource = compras
+                .Select(c => new
+                {
+                    c.CompraId,
+                    c.FechaHora,
+                    Proveedor = proveedores.FirstOrDefault(p => p.ProveedorId == c.NombreProveedor)?.Nombre ?? $"Proveedor {c.NombreProveedor}",
+                    c.NumFact,
+                    Usuario = usuarios.FirstOrDefault(u => u.UsuarioId == c.NombreUsuario)?.Nombre ?? $"Usuario {c.NombreUsuario}",
+                    c.SubTotal,
+                    c.TotalPagar,
+                    c.Estado
+                })
+                .ToList();
+            lblEstado.Text = compras.Count == 1 ? "1 compra registrada" : $"{compras.Count} compras registradas";
+        }
+
+        private void MostrarOcupado(bool ocupado, string? mensaje = null)
+        {
+            panelDatos.Enabled = !ocupado;
+            UseWaitCursor = ocupado;
+            if (mensaje != null) lblEstado.Text = mensaje;
         }
 
         private bool ValidarCampos()
@@ -117,38 +132,47 @@ namespace View
         private void LimpiarCampos()
         {
             dtpFechaHora.Value = DateTime.Now;
-            cboProveedor.SelectedIndex = -1;
+            VaciarSeleccion(cboProveedor);
             nudNumFact.Value = nudNumFact.Minimum;
             cboEstado.SelectedIndex = 0;
-            cboUsuario.SelectedIndex = -1;
+            VaciarSeleccion(cboUsuario);
             nudSubTotal.Value = 0;
             nudTotalPagar.Value = 0;
             dgvCompras.ClearSelection();
             dtpFechaHora.Focus();
         }
 
-        private void btnAgregar_Click(object sender, EventArgs e)
+        // En un ComboBox enlazado a datos, WinForms solo lo deja vacío si se asigna -1 dos veces
+        private static void VaciarSeleccion(ComboBox combo)
+        {
+            combo.SelectedIndex = -1;
+            combo.SelectedIndex = -1;
+        }
+
+        private async void btnAgregar_Click(object sender, EventArgs e)
         {
             if (!ValidarCampos()) return;
 
+            var compra = new Compra
+            {
+                FechaHora = dtpFechaHora.Value,
+                NombreProveedor = Convert.ToInt16(cboProveedor.SelectedValue),
+                NumFact = (int)nudNumFact.Value,
+                NombreUsuario = Convert.ToInt32(cboUsuario.SelectedValue),
+                SubTotal = nudSubTotal.Value,
+                TotalPagar = nudTotalPagar.Value,
+                Estado = cboEstado.Text
+            };
+            MostrarOcupado(true, "Guardando...");
             try
             {
-                var compra = new Compra
-                {
-                    FechaHora = dtpFechaHora.Value,
-                    NombreProveedor = Convert.ToInt16(cboProveedor.SelectedValue),
-                    NumFact = (int)nudNumFact.Value,
-                    NombreUsuario = Convert.ToInt32(cboUsuario.SelectedValue),
-                    SubTotal = nudSubTotal.Value,
-                    TotalPagar = nudTotalPagar.Value,
-                    Estado = cboEstado.Text
-                };
-                int filas = Compra_BL.Agregar(compra);
+                int filas = await Task.Run(() => Compra_BL.Agregar(compra));
+                if (IsDisposed) return;
                 if (filas > 0)
                 {
                     MessageBox.Show("Compra agregada.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await CargarComprasAsync();
                     LimpiarCampos();
-                    CargarCompras();
                 }
                 else
                 {
@@ -157,7 +181,12 @@ namespace View
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 MessageBox.Show("No se pudo agregar la compra.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
             }
         }
 

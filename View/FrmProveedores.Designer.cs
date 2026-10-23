@@ -265,7 +265,7 @@
             // colCodigo
             // 
             colCodigo.DataPropertyName = "ProveedorId";
-            colCodigo.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colCodigo.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colCodigo.FillWeight = 50F;
             colCodigo.HeaderText = "Código";
             colCodigo.MinimumWidth = 6;
@@ -293,7 +293,7 @@
             // colTelefono
             // 
             colTelefono.DataPropertyName = "Telefono";
-            colTelefono.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colTelefono.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colTelefono.FillWeight = 75F;
             colTelefono.HeaderText = "Teléfono";
             colTelefono.MinimumWidth = 6;

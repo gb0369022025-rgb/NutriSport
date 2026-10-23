@@ -15,49 +15,74 @@ namespace View
             dgvProductos.AutoGenerateColumns = false;
         }
 
-        private void FrmProductos_Load(object sender, EventArgs e)
+        // Categorías y productos se consultan al mismo tiempo, en segundo plano
+        private async void FrmProductos_Load(object sender, EventArgs e)
         {
-            CargarCategorias();
-            CargarProductos();
-            LimpiarCampos();
-        }
-
-        private void CargarCategorias()
-        {
+            MostrarOcupado(true, "Cargando productos...");
             try
             {
-                List<Categoria> categorias = Categoria_BL.ObtenerTodos();
-                cboCategoria.DataSource = categorias;
+                Task<List<Categoria>> tareaCategorias = Task.Run(() => Categoria_BL.ObtenerTodos());
+                Task<List<Producto>> tareaProductos = Task.Run(() => Producto_BL.ObtenerTodos());
+                await Task.WhenAll(tareaCategorias, tareaProductos);
+                if (IsDisposed) return;
+
+                cboCategoria.DataSource = tareaCategorias.Result;
                 cboCategoria.DisplayMember = nameof(Categoria.NombreCategoria);
                 cboCategoria.ValueMember = nameof(Categoria.CategoriaId);
-                cboCategoria.SelectedIndex = -1;
+                MostrarProductos(tareaProductos.Result, string.Empty);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("No se pudo cargar la lista de categorías.\n\nDetalle: " + ex.Message,
+                if (IsDisposed) return;
+                lblEstado.Text = "Sin conexión con la base de datos";
+                MessageBox.Show("No se pudieron cargar los productos y categorías. Revisa la conexión con la base de datos.\n\nDetalle: " + ex.Message,
                     Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+            if (!IsDisposed) LimpiarCampos();
         }
 
-        private void CargarProductos()
+        private async Task CargarProductosAsync()
         {
+            string texto = txtBuscar.Text.Trim();
+            MostrarOcupado(true, "Cargando productos...");
             try
             {
-                string texto = txtBuscar.Text.Trim();
-                List<Producto> productos = texto.Length == 0
+                List<Producto> productos = await Task.Run(() => texto.Length == 0
                     ? Producto_BL.ObtenerTodos()
-                    : Producto_BL.BuscarPorNombre(texto);
-                dgvProductos.DataSource = productos;
-
-                string cantidad = productos.Count == 1 ? "1 producto" : $"{productos.Count} productos";
-                lblEstado.Text = texto.Length == 0 ? cantidad + " registrados" : $"{cantidad} encontrados para \"{texto}\"";
+                    : Producto_BL.BuscarPorNombre(texto));
+                if (IsDisposed) return;
+                MostrarProductos(productos, texto);
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 lblEstado.Text = "Sin conexión con la base de datos";
                 MessageBox.Show("No se pudo cargar la lista de productos. Revisa la conexión con la base de datos.\n\nDetalle: " + ex.Message,
                     Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+        }
+
+        private void MostrarProductos(List<Producto> productos, string texto)
+        {
+            dgvProductos.DataSource = productos;
+            string cantidad = productos.Count == 1 ? "1 producto" : $"{productos.Count} productos";
+            lblEstado.Text = texto.Length == 0 ? cantidad + " registrados" : $"{cantidad} encontrados para \"{texto}\"";
+        }
+
+        private void MostrarOcupado(bool ocupado, string? mensaje = null)
+        {
+            panelDatos.Enabled = !ocupado;
+            panelBusqueda.Enabled = !ocupado;
+            UseWaitCursor = ocupado;
+            if (mensaje != null) lblEstado.Text = mensaje;
         }
 
         private bool ValidarCampos()
@@ -101,25 +126,34 @@ namespace View
             txtNombre.Clear();
             nudPrecio.Value = 0;
             nudExistencia.Value = 0;
-            cboCategoria.SelectedIndex = -1;
+            VaciarSeleccion(cboCategoria);
             btnModificar.Enabled = false;
             dgvProductos.ClearSelection();
             txtNombre.Focus();
         }
 
-        private void btnAgregar_Click(object sender, EventArgs e)
+        // En un ComboBox enlazado a datos, WinForms solo lo deja vacío si se asigna -1 dos veces
+        private static void VaciarSeleccion(ComboBox combo)
+        {
+            combo.SelectedIndex = -1;
+            combo.SelectedIndex = -1;
+        }
+
+        private async void btnAgregar_Click(object sender, EventArgs e)
         {
             if (!ValidarCampos()) return;
 
+            Producto producto = LeerCampos();
+            MostrarOcupado(true, "Guardando...");
             try
             {
-                Producto producto = LeerCampos();
-                int filas = Producto_BL.Agregar(producto);
+                int filas = await Task.Run(() => Producto_BL.Agregar(producto));
+                if (IsDisposed) return;
                 if (filas > 0)
                 {
                     MessageBox.Show("Producto agregado.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await CargarProductosAsync();
                     LimpiarCampos();
-                    CargarProductos();
                 }
                 else
                 {
@@ -128,11 +162,16 @@ namespace View
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 MessageBox.Show("No se pudo agregar el producto.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
             }
         }
 
-        private void btnModificar_Click(object sender, EventArgs e)
+        private async void btnModificar_Click(object sender, EventArgs e)
         {
             if (productoIdSeleccionado == 0)
             {
@@ -141,15 +180,17 @@ namespace View
             }
             if (!ValidarCampos()) return;
 
+            Producto producto = LeerCampos();
+            MostrarOcupado(true, "Guardando...");
             try
             {
-                Producto producto = LeerCampos();
-                int filas = Producto_BL.Modificar(producto);
+                int filas = await Task.Run(() => Producto_BL.Modificar(producto));
+                if (IsDisposed) return;
                 if (filas > 0)
                 {
                     MessageBox.Show("Producto modificado.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await CargarProductosAsync();
                     LimpiarCampos();
-                    CargarProductos();
                 }
                 else
                 {
@@ -158,7 +199,12 @@ namespace View
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 MessageBox.Show("No se pudo modificar el producto.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
             }
         }
 
@@ -167,17 +213,17 @@ namespace View
             LimpiarCampos();
         }
 
-        private void btnBuscar_Click(object sender, EventArgs e)
+        private async void btnBuscar_Click(object sender, EventArgs e)
         {
-            CargarProductos();
+            await CargarProductosAsync();
         }
 
-        private void txtBuscar_KeyDown(object sender, KeyEventArgs e)
+        private async void txtBuscar_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
             {
                 e.SuppressKeyPress = true;
-                CargarProductos();
+                await CargarProductosAsync();
             }
         }
 
@@ -193,7 +239,7 @@ namespace View
             if (producto.CategoriaId.HasValue)
                 cboCategoria.SelectedValue = producto.CategoriaId.Value;
             else
-                cboCategoria.SelectedIndex = -1;
+                VaciarSeleccion(cboCategoria);
             btnModificar.Enabled = true;
         }
 

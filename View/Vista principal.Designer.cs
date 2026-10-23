@@ -193,6 +193,7 @@
             lblCatInventario.Size = new Size(185, 20);
             lblCatInventario.TabIndex = 5;
             lblCatInventario.Text = "INVENTARIO & PRODUCTOS";
+            lblCatInventario.UseMnemonic = false;
             // 
             // btnCategorias
             // 
@@ -248,6 +249,7 @@
             lblCatOperaciones.Size = new Size(214, 20);
             lblCatOperaciones.TabIndex = 9;
             lblCatOperaciones.Text = "OPERACIONES & PROVEEDORES";
+            lblCatOperaciones.UseMnemonic = false;
             // 
             // btnCompras
             // 
@@ -294,12 +296,13 @@
             btnEmpleados.FlatAppearance.BorderSize = 0;
             btnEmpleados.FlatStyle = FlatStyle.Flat;
             btnEmpleados.ForeColor = Color.White;
-            btnEmpleados.Location = new Point(-39, 490);
+            btnEmpleados.Location = new Point(10, 490);
             btnEmpleados.Name = "btnEmpleados";
             btnEmpleados.Padding = new Padding(10, 0, 0, 0);
             btnEmpleados.Size = new Size(200, 35);
             btnEmpleados.TabIndex = 13;
             btnEmpleados.Text = "Empleados";
+            btnEmpleados.TextAlign = ContentAlignment.MiddleLeft;
             btnEmpleados.UseVisualStyleBackColor = true;
             btnEmpleados.Click += btnEmpleados_Click;
             // 

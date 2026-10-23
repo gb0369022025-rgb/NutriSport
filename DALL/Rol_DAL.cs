@@ -12,8 +12,7 @@ namespace NutriSport.DAL
             var lista = new List<Rol>();
             using (var conn = BDComun.ObtenerConexion())
             {
-                string query = "SELECT RolId, Nombre, Descripcion, Estado FROM ROL WHERE Estado = 1";
-                using (var cmd = new SqlCommand(query, conn))
+                using (var cmd = BDComun.ObtenerComando("SpSelectAllRol", conn))
                 {
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -21,10 +20,9 @@ namespace NutriSport.DAL
                         {
                             lista.Add(new Rol
                             {
-                                RolId = Convert.ToInt16(reader["RolId"]),
-                                Nombre = reader["Nombre"].ToString() ?? string.Empty,
-                                Descripcion = reader["Descripcion"].ToString() ?? string.Empty,
-                                Estado = Convert.ToInt32(reader["Estado"])
+                                RolId = Convert.ToInt16(reader["Código"]),
+                                Nombre = reader["Rol"].ToString() ?? string.Empty,
+                                Descripcion = reader["Descripción"].ToString() ?? string.Empty
                             });
                         }
                     }
@@ -37,12 +35,10 @@ namespace NutriSport.DAL
         {
             using (var conn = BDComun.ObtenerConexion())
             {
-                string query = "INSERT INTO ROL (Nombre, Descripcion, Estado) VALUES (@Nombre, @Descripcion, @Estado)";
-                using (var cmd = new SqlCommand(query, conn))
+                using (var cmd = BDComun.ObtenerComando("SpInsertRol", conn))
                 {
                     cmd.Parameters.AddWithValue("@Nombre", entidad.Nombre);
                     cmd.Parameters.AddWithValue("@Descripcion", entidad.Descripcion);
-                    cmd.Parameters.AddWithValue("@Estado", entidad.Estado);
                     return cmd.ExecuteNonQuery();
                 }
             }

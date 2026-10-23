@@ -39,8 +39,6 @@
             panelDatos = new Panel();
             lblNumeroPedido = new Label();
             nudNumeroPedido = new NumericUpDown();
-            lblFecha = new Label();
-            dtpFecha = new DateTimePicker();
             lblEstadoRegistro = new Label();
             cboEstado = new ComboBox();
             btnAgregar = new Button();
@@ -118,8 +116,6 @@
             panelDatos.Controls.Add(btnAgregar);
             panelDatos.Controls.Add(lblEstadoRegistro);
             panelDatos.Controls.Add(cboEstado);
-            panelDatos.Controls.Add(lblFecha);
-            panelDatos.Controls.Add(dtpFecha);
             panelDatos.Controls.Add(lblNumeroPedido);
             panelDatos.Controls.Add(nudNumeroPedido);
             panelDatos.Dock = DockStyle.Left;
@@ -148,33 +144,14 @@
             nudNumeroPedido.TabIndex = 1;
             nudNumeroPedido.Value = new decimal(new int[] { 1, 0, 0, 0 });
             // 
-            // lblFecha
-            // 
-            lblFecha.AutoSize = true;
-            lblFecha.ForeColor = Color.FromArgb(30, 30, 30);
-            lblFecha.Location = new Point(20, 83);
-            lblFecha.Name = "lblFecha";
-            lblFecha.Size = new Size(95, 20);
-            lblFecha.TabIndex = 2;
-            lblFecha.Text = "Fecha y hora";
-            // 
-            // dtpFecha
-            // 
-            dtpFecha.CustomFormat = "dd/MM/yyyy HH:mm";
-            dtpFecha.Format = DateTimePickerFormat.Custom;
-            dtpFecha.Location = new Point(20, 105);
-            dtpFecha.Name = "dtpFecha";
-            dtpFecha.Size = new Size(320, 27);
-            dtpFecha.TabIndex = 3;
-            // 
             // lblEstadoRegistro
             // 
             lblEstadoRegistro.AutoSize = true;
             lblEstadoRegistro.ForeColor = Color.FromArgb(30, 30, 30);
-            lblEstadoRegistro.Location = new Point(20, 146);
+            lblEstadoRegistro.Location = new Point(20, 83);
             lblEstadoRegistro.Name = "lblEstadoRegistro";
             lblEstadoRegistro.Size = new Size(49, 20);
-            lblEstadoRegistro.TabIndex = 4;
+            lblEstadoRegistro.TabIndex = 2;
             lblEstadoRegistro.Text = "Estado";
             // 
             // cboEstado
@@ -182,10 +159,10 @@
             cboEstado.DropDownStyle = ComboBoxStyle.DropDownList;
             cboEstado.FormattingEnabled = true;
             cboEstado.Items.AddRange(new object[] { "Pendiente", "Entregado", "Cancelado" });
-            cboEstado.Location = new Point(20, 168);
+            cboEstado.Location = new Point(20, 105);
             cboEstado.Name = "cboEstado";
             cboEstado.Size = new Size(320, 28);
-            cboEstado.TabIndex = 5;
+            cboEstado.TabIndex = 3;
             // 
             // btnAgregar
             // 
@@ -193,10 +170,10 @@
             btnAgregar.FlatAppearance.BorderSize = 0;
             btnAgregar.FlatStyle = FlatStyle.Flat;
             btnAgregar.ForeColor = Color.White;
-            btnAgregar.Location = new Point(20, 220);
+            btnAgregar.Location = new Point(20, 157);
             btnAgregar.Name = "btnAgregar";
             btnAgregar.Size = new Size(155, 38);
-            btnAgregar.TabIndex = 6;
+            btnAgregar.TabIndex = 4;
             btnAgregar.Text = "Agregar";
             btnAgregar.UseVisualStyleBackColor = false;
             btnAgregar.Click += btnAgregar_Click;
@@ -205,10 +182,10 @@
             // 
             btnLimpiar.BackColor = Color.FromArgb(230, 235, 240);
             btnLimpiar.FlatStyle = FlatStyle.Flat;
-            btnLimpiar.Location = new Point(185, 220);
+            btnLimpiar.Location = new Point(185, 157);
             btnLimpiar.Name = "btnLimpiar";
             btnLimpiar.Size = new Size(155, 38);
-            btnLimpiar.TabIndex = 7;
+            btnLimpiar.TabIndex = 5;
             btnLimpiar.Text = "Limpiar";
             btnLimpiar.UseVisualStyleBackColor = false;
             btnLimpiar.Click += btnLimpiar_Click;
@@ -266,13 +243,13 @@
             dgvPedidos.RowTemplate.Height = 32;
             dgvPedidos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvPedidos.Size = new Size(692, 473);
-            dgvPedidos.TabIndex = 8;
+            dgvPedidos.TabIndex = 6;
             dgvPedidos.DataBindingComplete += dgvPedidos_DataBindingComplete;
             // 
             // colCodigo
             // 
             colCodigo.DataPropertyName = "PedidoId";
-            colCodigo.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colCodigo.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colCodigo.FillWeight = 50F;
             colCodigo.HeaderText = "Código";
             colCodigo.MinimumWidth = 6;
@@ -282,7 +259,7 @@
             // colNumeroPedido
             // 
             colNumeroPedido.DataPropertyName = "NumeroPedido";
-            colNumeroPedido.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colNumeroPedido.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colNumeroPedido.FillWeight = 70F;
             colNumeroPedido.HeaderText = "N° pedido";
             colNumeroPedido.MinimumWidth = 6;
@@ -295,7 +272,7 @@
             dataGridViewCellStyle3.Format = "dd/MM/yyyy HH:mm";
             dataGridViewCellStyle3.NullValue = null;
             colFecha.DefaultCellStyle = dataGridViewCellStyle3;
-            colFecha.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colFecha.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colFecha.FillWeight = 100F;
             colFecha.HeaderText = "Fecha";
             colFecha.MinimumWidth = 6;
@@ -305,10 +282,9 @@
             // colEstado
             // 
             colEstado.DataPropertyName = "Estado";
-            colEstado.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
             colEstado.FillWeight = 80F;
             colEstado.HeaderText = "Estado";
-            colEstado.MinimumWidth = 6;
+            colEstado.MinimumWidth = 90;
             colEstado.Name = "colEstado";
             colEstado.ReadOnly = true;
             // 
@@ -348,8 +324,6 @@
         private Panel panelDatos;
         private Label lblNumeroPedido;
         private NumericUpDown nudNumeroPedido;
-        private Label lblFecha;
-        private DateTimePicker dtpFecha;
         private Label lblEstadoRegistro;
         private ComboBox cboEstado;
         private Button btnAgregar;

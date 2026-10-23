@@ -14,45 +14,71 @@ namespace View
             dgvUsuarios.AutoGenerateColumns = false;
         }
 
-        private void FrmUsuarios_Load(object sender, EventArgs e)
+        // Empleados y usuarios se consultan al mismo tiempo, en segundo plano
+        private async void FrmUsuarios_Load(object sender, EventArgs e)
         {
-            CargarEmpleados();
-            CargarUsuarios();
-            LimpiarCampos();
-        }
-
-        private void CargarEmpleados()
-        {
+            MostrarOcupado(true, "Cargando usuarios...");
             try
             {
-                List<Empleado> empleados = Empleado_BL.ObtenerTodos();
+                Task<List<Empleado>> tareaEmpleados = Task.Run(() => Empleado_BL.ObtenerTodos());
+                Task<List<Usuario>> tareaUsuarios = Task.Run(() => Usuario_BL.ObtenerTodos());
+                await Task.WhenAll(tareaEmpleados, tareaUsuarios);
+                if (IsDisposed) return;
+
                 cboEmpleado.Items.Clear();
-                foreach (Empleado empleado in empleados)
+                foreach (Empleado empleado in tareaEmpleados.Result)
                 {
                     cboEmpleado.Items.Add($"{empleado.Nombre} {empleado.Apellido}".Trim());
                 }
+                MostrarUsuarios(tareaUsuarios.Result);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("No se pudo cargar la lista de empleados. Puedes escribir el nombre del empleado a mano.\n\nDetalle: " + ex.Message,
-                    Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                if (IsDisposed) return;
+                lblEstado.Text = "Sin conexión con la base de datos";
+                MessageBox.Show("No se pudieron cargar los usuarios y empleados. Revisa la conexión con la base de datos.\n\nDetalle: " + ex.Message,
+                    Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+            if (!IsDisposed) LimpiarCampos();
         }
 
-        private void CargarUsuarios()
+        private async Task CargarUsuariosAsync()
         {
+            MostrarOcupado(true, "Cargando usuarios...");
             try
             {
-                List<Usuario> usuarios = Usuario_BL.ObtenerTodos();
-                dgvUsuarios.DataSource = usuarios;
-                lblEstado.Text = usuarios.Count == 1 ? "1 usuario registrado" : $"{usuarios.Count} usuarios registrados";
+                List<Usuario> usuarios = await Task.Run(() => Usuario_BL.ObtenerTodos());
+                if (IsDisposed) return;
+                MostrarUsuarios(usuarios);
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 lblEstado.Text = "Sin conexión con la base de datos";
                 MessageBox.Show("No se pudo cargar la lista de usuarios. Revisa la conexión con la base de datos.\n\nDetalle: " + ex.Message,
                     Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+        }
+
+        private void MostrarUsuarios(List<Usuario> usuarios)
+        {
+            dgvUsuarios.DataSource = usuarios;
+            lblEstado.Text = usuarios.Count == 1 ? "1 usuario registrado" : $"{usuarios.Count} usuarios registrados";
+        }
+
+        private void MostrarOcupado(bool ocupado, string? mensaje = null)
+        {
+            panelDatos.Enabled = !ocupado;
+            UseWaitCursor = ocupado;
+            if (mensaje != null) lblEstado.Text = mensaje;
         }
 
         private bool ValidarCampos()
@@ -96,35 +122,42 @@ namespace View
             txtNombreUsuario.Focus();
         }
 
-        private void btnAgregar_Click(object sender, EventArgs e)
+        private async void btnAgregar_Click(object sender, EventArgs e)
         {
             if (!ValidarCampos()) return;
 
+            var usuario = new Usuario
+            {
+                Nombre = txtNombreUsuario.Text.Trim(),
+                NombreEmpleado = cboEmpleado.Text.Trim(),
+                Clave = txtClave.Text,
+                Tipo = cboTipo.Text,
+                Estado = cboEstado.Text
+            };
+            MostrarOcupado(true, "Guardando...");
             try
             {
-                var usuario = new Usuario
-                {
-                    Nombre = txtNombreUsuario.Text.Trim(),
-                    NombreEmpleado = cboEmpleado.Text.Trim(),
-                    Clave = txtClave.Text,
-                    Tipo = cboTipo.Text,
-                    Estado = cboEstado.Text
-                };
-                int filas = Usuario_BL.Agregar(usuario);
+                int filas = await Task.Run(() => Usuario_BL.Agregar(usuario));
+                if (IsDisposed) return;
                 if (filas > 0)
                 {
                     MessageBox.Show("Usuario agregado.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await CargarUsuariosAsync();
                     LimpiarCampos();
-                    CargarUsuarios();
                 }
                 else
                 {
-                    MessageBox.Show("No se agregó el usuario. Intenta de nuevo.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Ese nombre de usuario ya está ocupado.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 MessageBox.Show("No se pudo agregar el usuario.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
             }
         }
 

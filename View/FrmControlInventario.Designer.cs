@@ -320,7 +320,7 @@
             // colCodigo
             // 
             colCodigo.DataPropertyName = "ControlInvId";
-            colCodigo.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colCodigo.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colCodigo.FillWeight = 50F;
             colCodigo.HeaderText = "Código";
             colCodigo.MinimumWidth = 6;
@@ -333,7 +333,7 @@
             dataGridViewCellStyle3.Format = "dd/MM/yyyy HH:mm";
             dataGridViewCellStyle3.NullValue = null;
             colFechaHora.DefaultCellStyle = dataGridViewCellStyle3;
-            colFechaHora.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colFechaHora.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colFechaHora.FillWeight = 95F;
             colFechaHora.HeaderText = "Fecha y hora";
             colFechaHora.MinimumWidth = 6;
@@ -352,7 +352,7 @@
             // colCantProducto
             // 
             colCantProducto.DataPropertyName = "CantProducto";
-            colCantProducto.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colCantProducto.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colCantProducto.FillWeight = 65F;
             colCantProducto.HeaderText = "Cantidad";
             colCantProducto.MinimumWidth = 6;
@@ -371,7 +371,7 @@
             // colEstado
             // 
             colEstado.DataPropertyName = "Estado";
-            colEstado.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colEstado.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colEstado.FillWeight = 70F;
             colEstado.HeaderText = "Estado";
             colEstado.MinimumWidth = 6;

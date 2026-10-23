@@ -14,54 +14,80 @@ namespace View
             dgvControlInventario.AutoGenerateColumns = false;
         }
 
-        private void FrmControlInventario_Load(object sender, EventArgs e)
+        // Usuarios y controles se consultan al mismo tiempo, en segundo plano
+        private async void FrmControlInventario_Load(object sender, EventArgs e)
         {
-            CargarUsuarios();
-            CargarControles();
-            LimpiarCampos();
-        }
-
-        private void CargarUsuarios()
-        {
+            MostrarOcupado(true, "Cargando controles...");
             try
             {
-                usuarios = Usuario_BL.ObtenerTodos();
+                Task<List<Usuario>> tareaUsuarios = Task.Run(() => Usuario_BL.ObtenerTodos());
+                Task<List<Ctrl_Inventario>> tareaControles = Task.Run(() => Ctrl_Inventario_BL.ObtenerTodos());
+                await Task.WhenAll(tareaUsuarios, tareaControles);
+                if (IsDisposed) return;
+
+                usuarios = tareaUsuarios.Result;
                 cboUsuario.DataSource = usuarios;
                 cboUsuario.DisplayMember = nameof(Usuario.Nombre);
                 cboUsuario.ValueMember = nameof(Usuario.UsuarioId);
-                cboUsuario.SelectedIndex = -1;
+                MostrarControles(tareaControles.Result);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("No se pudo cargar la lista de usuarios.\n\nDetalle: " + ex.Message,
+                if (IsDisposed) return;
+                lblEstado.Text = "Sin conexión con la base de datos";
+                MessageBox.Show("No se pudo cargar el historial de control de inventario y los usuarios. Revisa la conexión con la base de datos.\n\nDetalle: " + ex.Message,
                     Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+            if (!IsDisposed) LimpiarCampos();
         }
 
-        private void CargarControles()
+        private async Task CargarControlesAsync()
         {
+            MostrarOcupado(true, "Cargando controles...");
             try
             {
-                List<Ctrl_Inventario> controles = Ctrl_Inventario_BL.ObtenerTodos();
-                dgvControlInventario.DataSource = controles
-                    .Select(c => new
-                    {
-                        c.ControlInvId,
-                        c.FechaHora,
-                        Usuario = usuarios.FirstOrDefault(u => u.UsuarioId == c.NombreUsuario)?.Nombre ?? $"Usuario {c.NombreUsuario}",
-                        c.CantProducto,
-                        c.Observacion,
-                        c.Estado
-                    })
-                    .ToList();
-                lblEstado.Text = controles.Count == 1 ? "1 control registrado" : $"{controles.Count} controles registrados";
+                List<Ctrl_Inventario> controles = await Task.Run(() => Ctrl_Inventario_BL.ObtenerTodos());
+                if (IsDisposed) return;
+                MostrarControles(controles);
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 lblEstado.Text = "Sin conexión con la base de datos";
                 MessageBox.Show("No se pudo cargar el historial de control de inventario. Revisa la conexión con la base de datos.\n\nDetalle: " + ex.Message,
                     Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+        }
+
+        private void MostrarControles(List<Ctrl_Inventario> controles)
+        {
+            dgvControlInventario.DataSource = controles
+                .Select(c => new
+                {
+                    c.ControlInvId,
+                    c.FechaHora,
+                    Usuario = usuarios.FirstOrDefault(u => u.UsuarioId == c.NombreUsuario)?.Nombre ?? $"Usuario {c.NombreUsuario}",
+                    c.CantProducto,
+                    c.Observacion,
+                    c.Estado
+                })
+                .ToList();
+            lblEstado.Text = controles.Count == 1 ? "1 control registrado" : $"{controles.Count} controles registrados";
+        }
+
+        private void MostrarOcupado(bool ocupado, string? mensaje = null)
+        {
+            panelDatos.Enabled = !ocupado;
+            UseWaitCursor = ocupado;
+            if (mensaje != null) lblEstado.Text = mensaje;
         }
 
         private bool ValidarCampos()
@@ -77,7 +103,7 @@ namespace View
 
         private void LimpiarCampos()
         {
-            cboUsuario.SelectedIndex = -1;
+            VaciarSeleccion(cboUsuario);
             dtpFechaHora.Value = DateTime.Now;
             nudCantProducto.Value = 0;
             cboEstado.SelectedIndex = 0;
@@ -86,26 +112,35 @@ namespace View
             cboUsuario.Focus();
         }
 
-        private void btnAgregar_Click(object sender, EventArgs e)
+        // En un ComboBox enlazado a datos, WinForms solo lo deja vacío si se asigna -1 dos veces
+        private static void VaciarSeleccion(ComboBox combo)
+        {
+            combo.SelectedIndex = -1;
+            combo.SelectedIndex = -1;
+        }
+
+        private async void btnAgregar_Click(object sender, EventArgs e)
         {
             if (!ValidarCampos()) return;
 
+            var control = new Ctrl_Inventario
+            {
+                NombreUsuario = Convert.ToInt32(cboUsuario.SelectedValue),
+                FechaHora = dtpFechaHora.Value,
+                CantProducto = (int)nudCantProducto.Value,
+                Observacion = string.IsNullOrWhiteSpace(txtObservacion.Text) ? null : txtObservacion.Text.Trim(),
+                Estado = cboEstado.Text
+            };
+            MostrarOcupado(true, "Guardando...");
             try
             {
-                var control = new Ctrl_Inventario
-                {
-                    NombreUsuario = Convert.ToInt32(cboUsuario.SelectedValue),
-                    FechaHora = dtpFechaHora.Value,
-                    CantProducto = (int)nudCantProducto.Value,
-                    Observacion = string.IsNullOrWhiteSpace(txtObservacion.Text) ? null : txtObservacion.Text.Trim(),
-                    Estado = cboEstado.Text
-                };
-                int filas = Ctrl_Inventario_BL.Agregar(control);
+                int filas = await Task.Run(() => Ctrl_Inventario_BL.Agregar(control));
+                if (IsDisposed) return;
                 if (filas > 0)
                 {
                     MessageBox.Show("Control de inventario agregado.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await CargarControlesAsync();
                     LimpiarCampos();
-                    CargarControles();
                 }
                 else
                 {
@@ -114,7 +149,12 @@ namespace View
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 MessageBox.Show("No se pudo agregar el control de inventario.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
             }
         }
 

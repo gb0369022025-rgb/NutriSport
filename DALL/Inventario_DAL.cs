@@ -12,8 +12,7 @@ namespace NutriSport.DAL
             var lista = new List<Inventario>();
             using (var conn = BDComun.ObtenerConexion())
             {
-                string query = "SELECT InventarioId, Existencias, FechaActualizacion FROM INVENTARIO";
-                using (var cmd = new SqlCommand(query, conn))
+                using (var cmd = BDComun.ObtenerComando("SpSelectAllInventario", conn))
                 {
                     using (var reader = cmd.ExecuteReader())
                     {
@@ -21,9 +20,9 @@ namespace NutriSport.DAL
                         {
                             lista.Add(new Inventario
                             {
-                                InventarioId = Convert.ToInt32(reader["InventarioId"]),
+                                InventarioId = Convert.ToInt32(reader["Código"]),
                                 Existencias = Convert.ToInt32(reader["Existencias"]),
-                                FechaActualizacion = Convert.ToDateTime(reader["FechaActualizacion"])
+                                FechaActualizacion = Convert.ToDateTime(reader["Fecha Actualización"])
                             });
                         }
                     }

@@ -14,26 +14,41 @@ namespace View
             dgvClientes.AutoGenerateColumns = false;
         }
 
-        private void FrmClientes_Load(object sender, EventArgs e)
+        private async void FrmClientes_Load(object sender, EventArgs e)
         {
-            CargarClientes();
+            await CargarClientesAsync();
             LimpiarCampos();
         }
 
-        private void CargarClientes()
+        // Las consultas se hacen en segundo plano para que la ventana no se congele mientras responde la BD
+        private async Task CargarClientesAsync()
         {
+            MostrarOcupado(true, "Cargando clientes...");
             try
             {
-                List<Cliente> clientes = Cliente_BL.ObtenerTodos();
+                List<Cliente> clientes = await Task.Run(() => Cliente_BL.ObtenerTodos());
+                if (IsDisposed) return;
                 dgvClientes.DataSource = clientes;
                 lblEstado.Text = clientes.Count == 1 ? "1 cliente registrado" : $"{clientes.Count} clientes registrados";
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 lblEstado.Text = "Sin conexión con la base de datos";
                 MessageBox.Show("No se pudo cargar la lista de clientes. Revisa la conexión con la base de datos.\n\nDetalle: " + ex.Message,
                     Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+        }
+
+        private void MostrarOcupado(bool ocupado, string? mensaje = null)
+        {
+            panelDatos.Enabled = !ocupado;
+            UseWaitCursor = ocupado;
+            if (mensaje != null) lblEstado.Text = mensaje;
         }
 
         private bool ValidarCampos()
@@ -78,19 +93,21 @@ namespace View
             txtNombre.Focus();
         }
 
-        private void btnAgregar_Click(object sender, EventArgs e)
+        private async void btnAgregar_Click(object sender, EventArgs e)
         {
             if (!ValidarCampos()) return;
 
+            Cliente cliente = LeerCampos();
+            MostrarOcupado(true, "Guardando...");
             try
             {
-                Cliente cliente = LeerCampos();
-                int filas = Cliente_BL.Agregar(cliente);
+                int filas = await Task.Run(() => Cliente_BL.Agregar(cliente));
+                if (IsDisposed) return;
                 if (filas > 0)
                 {
                     MessageBox.Show("Cliente agregado.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await CargarClientesAsync();
                     LimpiarCampos();
-                    CargarClientes();
                 }
                 else
                 {
@@ -99,11 +116,16 @@ namespace View
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 MessageBox.Show("No se pudo agregar el cliente.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
             }
         }
 
-        private void btnModificar_Click(object sender, EventArgs e)
+        private async void btnModificar_Click(object sender, EventArgs e)
         {
             if (clienteIdSeleccionado == 0)
             {
@@ -112,15 +134,17 @@ namespace View
             }
             if (!ValidarCampos()) return;
 
+            Cliente cliente = LeerCampos();
+            MostrarOcupado(true, "Guardando...");
             try
             {
-                Cliente cliente = LeerCampos();
-                int filas = Cliente_BL.Modificar(cliente);
+                int filas = await Task.Run(() => Cliente_BL.Modificar(cliente));
+                if (IsDisposed) return;
                 if (filas > 0)
                 {
                     MessageBox.Show("Cliente modificado.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await CargarClientesAsync();
                     LimpiarCampos();
-                    CargarClientes();
                 }
                 else
                 {
@@ -129,7 +153,12 @@ namespace View
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 MessageBox.Show("No se pudo modificar el cliente.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
             }
         }
 

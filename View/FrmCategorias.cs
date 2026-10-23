@@ -14,26 +14,41 @@ namespace View
             dgvCategorias.AutoGenerateColumns = false;
         }
 
-        private void FrmCategorias_Load(object sender, EventArgs e)
+        private async void FrmCategorias_Load(object sender, EventArgs e)
         {
-            CargarCategorias();
+            await CargarCategoriasAsync();
             LimpiarCampos();
         }
 
-        private void CargarCategorias()
+        // Las consultas se hacen en segundo plano para que la ventana no se congele mientras responde la BD
+        private async Task CargarCategoriasAsync()
         {
+            MostrarOcupado(true, "Cargando categorías...");
             try
             {
-                List<Categoria> categorias = Categoria_BL.ObtenerTodos();
+                List<Categoria> categorias = await Task.Run(() => Categoria_BL.ObtenerTodos());
+                if (IsDisposed) return;
                 dgvCategorias.DataSource = categorias;
                 lblEstado.Text = categorias.Count == 1 ? "1 categoría registrada" : $"{categorias.Count} categorías registradas";
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 lblEstado.Text = "Sin conexión con la base de datos";
                 MessageBox.Show("No se pudo cargar la lista de categorías. Revisa la conexión con la base de datos.\n\nDetalle: " + ex.Message,
                     Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+        }
+
+        private void MostrarOcupado(bool ocupado, string? mensaje = null)
+        {
+            panelDatos.Enabled = !ocupado;
+            UseWaitCursor = ocupado;
+            if (mensaje != null) lblEstado.Text = mensaje;
         }
 
         private bool ValidarCampos()
@@ -57,19 +72,21 @@ namespace View
             txtNombreCategoria.Focus();
         }
 
-        private void btnAgregar_Click(object sender, EventArgs e)
+        private async void btnAgregar_Click(object sender, EventArgs e)
         {
             if (!ValidarCampos()) return;
 
+            var categoria = new Categoria { NombreCategoria = txtNombreCategoria.Text.Trim() };
+            MostrarOcupado(true, "Guardando...");
             try
             {
-                var categoria = new Categoria { NombreCategoria = txtNombreCategoria.Text.Trim() };
-                int filas = Categoria_BL.Agregar(categoria);
+                int filas = await Task.Run(() => Categoria_BL.Agregar(categoria));
+                if (IsDisposed) return;
                 if (filas > 0)
                 {
                     MessageBox.Show("Categoría agregada.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await CargarCategoriasAsync();
                     LimpiarCampos();
-                    CargarCategorias();
                 }
                 else
                 {
@@ -78,11 +95,16 @@ namespace View
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 MessageBox.Show("No se pudo agregar la categoría.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
             }
         }
 
-        private void btnModificar_Click(object sender, EventArgs e)
+        private async void btnModificar_Click(object sender, EventArgs e)
         {
             if (categoriaIdSeleccionada == 0)
             {
@@ -91,19 +113,21 @@ namespace View
             }
             if (!ValidarCampos()) return;
 
+            var categoria = new Categoria
+            {
+                CategoriaId = categoriaIdSeleccionada,
+                NombreCategoria = txtNombreCategoria.Text.Trim()
+            };
+            MostrarOcupado(true, "Guardando...");
             try
             {
-                var categoria = new Categoria
-                {
-                    CategoriaId = categoriaIdSeleccionada,
-                    NombreCategoria = txtNombreCategoria.Text.Trim()
-                };
-                int filas = Categoria_BL.Modificar(categoria);
+                int filas = await Task.Run(() => Categoria_BL.Modificar(categoria));
+                if (IsDisposed) return;
                 if (filas > 0)
                 {
                     MessageBox.Show("Categoría modificada.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await CargarCategoriasAsync();
                     LimpiarCampos();
-                    CargarCategorias();
                 }
                 else
                 {
@@ -112,11 +136,16 @@ namespace View
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 MessageBox.Show("No se pudo modificar la categoría.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
             }
         }
 
-        private void btnEliminar_Click(object sender, EventArgs e)
+        private async void btnEliminar_Click(object sender, EventArgs e)
         {
             if (categoriaIdSeleccionada == 0)
             {
@@ -128,25 +157,25 @@ namespace View
                 Titulo, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (respuesta != DialogResult.Yes) return;
 
+            int id = categoriaIdSeleccionada;
+            MostrarOcupado(true, "Eliminando...");
             try
             {
-                int filas = Categoria_BL.Eliminar(categoriaIdSeleccionada);
-                if (filas > 0)
-                {
-                    MessageBox.Show("Categoría eliminada.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LimpiarCampos();
-                    CargarCategorias();
-                }
-                else
-                {
-                    MessageBox.Show("La categoría ya no existe. Se actualizará la lista.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    LimpiarCampos();
-                    CargarCategorias();
-                }
+                int filas = await Task.Run(() => Categoria_BL.Eliminar(id));
+                if (IsDisposed) return;
+                MessageBox.Show(filas > 0 ? "Categoría eliminada." : "La categoría ya no existe. Se actualizará la lista.",
+                    Titulo, MessageBoxButtons.OK, filas > 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+                await CargarCategoriasAsync();
+                LimpiarCampos();
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 MessageBox.Show("No se pudo eliminar la categoría.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
             }
         }
 

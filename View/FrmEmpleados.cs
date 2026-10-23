@@ -13,26 +13,41 @@ namespace View
             dgvEmpleados.AutoGenerateColumns = false;
         }
 
-        private void FrmEmpleados_Load(object sender, EventArgs e)
+        private async void FrmEmpleados_Load(object sender, EventArgs e)
         {
-            CargarEmpleados();
+            await CargarEmpleadosAsync();
             LimpiarCampos();
         }
 
-        private void CargarEmpleados()
+        // Las consultas se hacen en segundo plano para que la ventana no se congele mientras responde la BD
+        private async Task CargarEmpleadosAsync()
         {
+            MostrarOcupado(true, "Cargando empleados...");
             try
             {
-                List<Empleado> empleados = Empleado_BL.ObtenerTodos();
+                List<Empleado> empleados = await Task.Run(() => Empleado_BL.ObtenerTodos());
+                if (IsDisposed) return;
                 dgvEmpleados.DataSource = empleados;
                 lblEstado.Text = empleados.Count == 1 ? "1 empleado registrado" : $"{empleados.Count} empleados registrados";
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 lblEstado.Text = "Sin conexión con la base de datos";
                 MessageBox.Show("No se pudo cargar la lista de empleados. Revisa la conexión con la base de datos.\n\nDetalle: " + ex.Message,
                     Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+        }
+
+        private void MostrarOcupado(bool ocupado, string? mensaje = null)
+        {
+            panelDatos.Enabled = !ocupado;
+            UseWaitCursor = ocupado;
+            if (mensaje != null) lblEstado.Text = mensaje;
         }
 
         private bool ValidarCampos()
@@ -73,39 +88,46 @@ namespace View
             txtNombre.Focus();
         }
 
-        private void btnAgregar_Click(object sender, EventArgs e)
+        private async void btnAgregar_Click(object sender, EventArgs e)
         {
             if (!ValidarCampos()) return;
 
+            var empleado = new Empleado
+            {
+                Nombre = txtNombre.Text.Trim(),
+                Apellido = txtApellido.Text.Trim(),
+                Telefono = txtTelefono.Text.Trim(),
+                DUI = txtDUI.Text.Trim(),
+                Email = txtEmail.Text.Trim(),
+                Direccion = txtDireccion.Text.Trim(),
+                RolId = (short)nudRolId.Value,
+                CargoId = (short)nudCargoId.Value
+            };
+            MostrarOcupado(true, "Guardando...");
             try
             {
-                var empleado = new Empleado
-                {
-                    Nombre = txtNombre.Text.Trim(),
-                    Apellido = txtApellido.Text.Trim(),
-                    Telefono = txtTelefono.Text.Trim(),
-                    DUI = txtDUI.Text.Trim(),
-                    Email = txtEmail.Text.Trim(),
-                    Direccion = txtDireccion.Text.Trim(),
-                    RolId = (short)nudRolId.Value,
-                    CargoId = (short)nudCargoId.Value
-                };
-                int filas = Empleado_BL.Agregar(empleado);
+                int filas = await Task.Run(() => Empleado_BL.Agregar(empleado));
+                if (IsDisposed) return;
                 if (filas > 0)
                 {
                     MessageBox.Show("Empleado agregado.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await CargarEmpleadosAsync();
                     LimpiarCampos();
-                    CargarEmpleados();
                 }
                 else
                 {
-                    MessageBox.Show("No se agregó el empleado. Intenta de nuevo.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Ya existe un empleado registrado con ese DUI.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("No se pudo agregar el empleado. Revisa que el DUI no esté repetido y que los códigos de rol y cargo existan.\n\nDetalle: " + ex.Message,
+                if (IsDisposed) return;
+                MessageBox.Show("No se pudo agregar el empleado. Revisa que los códigos de rol y cargo existan.\n\nDetalle: " + ex.Message,
                     Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
             }
         }
 

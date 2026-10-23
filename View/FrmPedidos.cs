@@ -13,17 +13,20 @@ namespace View
             dgvPedidos.AutoGenerateColumns = false;
         }
 
-        private void FrmPedidos_Load(object sender, EventArgs e)
+        private async void FrmPedidos_Load(object sender, EventArgs e)
         {
-            CargarPedidos();
+            await CargarPedidosAsync();
             LimpiarCampos();
         }
 
-        private void CargarPedidos()
+        // Las consultas se hacen en segundo plano para que la ventana no se congele mientras responde la BD
+        private async Task CargarPedidosAsync()
         {
+            MostrarOcupado(true, "Cargando pedidos...");
             try
             {
-                List<Pedido> pedidos = Pedido_BL.ObtenerTodos();
+                List<Pedido> pedidos = await Task.Run(() => Pedido_BL.ObtenerTodos());
+                if (IsDisposed) return;
                 dgvPedidos.DataSource = pedidos;
                 int pendientes = pedidos.Count(p => p.Estado == "Pendiente");
                 string total = pedidos.Count == 1 ? "1 pedido registrado" : $"{pedidos.Count} pedidos registrados";
@@ -31,37 +34,50 @@ namespace View
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 lblEstado.Text = "Sin conexión con la base de datos";
                 MessageBox.Show("No se pudo cargar la lista de pedidos. Revisa la conexión con la base de datos.\n\nDetalle: " + ex.Message,
                     Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+        }
+
+        private void MostrarOcupado(bool ocupado, string? mensaje = null)
+        {
+            panelDatos.Enabled = !ocupado;
+            UseWaitCursor = ocupado;
+            if (mensaje != null) lblEstado.Text = mensaje;
         }
 
         private void LimpiarCampos()
         {
             nudNumeroPedido.Value = nudNumeroPedido.Minimum;
-            dtpFecha.Value = DateTime.Now;
             cboEstado.SelectedIndex = 0;
             dgvPedidos.ClearSelection();
             nudNumeroPedido.Focus();
         }
 
-        private void btnAgregar_Click(object sender, EventArgs e)
+        private async void btnAgregar_Click(object sender, EventArgs e)
         {
+            // La fecha y hora del pedido las asigna SpInsertPedido al guardarlo
+            var pedido = new Pedido
+            {
+                NumeroPedido = (int)nudNumeroPedido.Value,
+                Estado = cboEstado.Text
+            };
+            MostrarOcupado(true, "Guardando...");
             try
             {
-                var pedido = new Pedido
-                {
-                    NumeroPedido = (int)nudNumeroPedido.Value,
-                    Fecha = dtpFecha.Value,
-                    Estado = cboEstado.Text
-                };
-                int filas = Pedido_BL.Agregar(pedido);
+                int filas = await Task.Run(() => Pedido_BL.Agregar(pedido));
+                if (IsDisposed) return;
                 if (filas > 0)
                 {
                     MessageBox.Show("Pedido agregado.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    await CargarPedidosAsync();
                     LimpiarCampos();
-                    CargarPedidos();
                 }
                 else
                 {
@@ -70,7 +86,12 @@ namespace View
             }
             catch (Exception ex)
             {
+                if (IsDisposed) return;
                 MessageBox.Show("No se pudo agregar el pedido.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
             }
         }
 

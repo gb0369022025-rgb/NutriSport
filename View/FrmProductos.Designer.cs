@@ -360,7 +360,7 @@
             // colCodigo
             // 
             colCodigo.DataPropertyName = "ProductoId";
-            colCodigo.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colCodigo.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colCodigo.FillWeight = 50F;
             colCodigo.HeaderText = "Código";
             colCodigo.MinimumWidth = 6;
@@ -383,7 +383,7 @@
             dataGridViewCellStyle3.Format = "$#,##0.00";
             dataGridViewCellStyle3.NullValue = null;
             colPrecio.DefaultCellStyle = dataGridViewCellStyle3;
-            colPrecio.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colPrecio.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colPrecio.FillWeight = 70F;
             colPrecio.HeaderText = "Precio";
             colPrecio.MinimumWidth = 6;
@@ -393,7 +393,7 @@
             // colExistencia
             // 
             colExistencia.DataPropertyName = "Existencia";
-            colExistencia.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colExistencia.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colExistencia.FillWeight = 70F;
             colExistencia.HeaderText = "Existencia";
             colExistencia.MinimumWidth = 6;

@@ -19,12 +19,16 @@ namespace NutriSport.DAL
                     {
                         while (reader.Read())
                         {
+                            // 'Categoria' viene como "Código - Nombre"
+                            string categoria = reader["Categoria"].ToString() ?? string.Empty;
+
                             lista.Add(new Producto
                             {
                                 ProductoId = Convert.ToInt16(reader["Cod."]),
                                 NombreProducto = reader["Producto"].ToString() ?? string.Empty,
                                 Precio = Convert.ToDecimal(reader["P. Unitario"]),
-                                Existencia = Convert.ToInt32(reader["Existencia"])
+                                Existencia = Convert.ToInt32(reader["Existencia"]),
+                                CategoriaId = Convert.ToInt32(categoria.Substring(0, categoria.IndexOf(" - ")))
                             });
                         }
                     }

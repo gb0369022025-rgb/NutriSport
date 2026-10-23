@@ -393,8 +393,8 @@ begin
 	       e.Email as 'Correo',
 	       e.DUI as 'DUI',
 	       e.Direccion as 'Dirección',
-	       r.Nombre as 'Rol',
-	       c.Nombre as 'Cargo'
+	       (cast(e.RolId as varchar) + ' - ' + r.Nombre) as 'Rol',
+	       (cast(e.CargoId as varchar) + ' - ' + c.Nombre) as 'Cargo'
 	from EMPLEADO e
 	inner join ROL r on e.RolId = r.RolId
 	inner join CARGO c on e.CargoId = c.CargoId
@@ -582,6 +582,16 @@ begin
 	where PedidoId = @PedidoId;
 end;
 
+go
+create procedure SpSelectAllEstado
+as
+begin
+	select EstadoId as 'Código',
+	       Nombre as 'Estado'
+	from ESTADO
+	order by Nombre asc;
+end;
+
 
 
 go
@@ -631,6 +641,22 @@ begin
 	where ProductoId = @ProductoId;
 end;
 
+go
+create procedure SpSelectDetalleVenta
+	@IdVenta int
+as
+begin
+	select DetalleVentaId as 'Código Detalle',
+	       Cantidad as 'Cantidad',
+	       PrecioUnitario as 'Precio Unitario',
+	       TotalPagar as 'Total Pagar',
+	       IdVenta as 'Código Venta',
+	       ProductoId as 'Código Producto'
+	from DETALLE_VENTA
+	where IdVenta = @IdVenta
+	order by DetalleVentaId asc;
+end;
+
 
 go
 create procedure SpSelectAllCompra
@@ -638,9 +664,9 @@ as
 begin
 	select c.CompraId as 'Código Compra',
 	       c.FechaHora as 'Fecha Hora',
-	       p.Nombre as 'Proveedor',
+	       (cast(c.NombreProveedor as varchar) + ' - ' + p.Nombre) as 'Proveedor',
 	       c.NumFact as 'N° Factura',
-	       u.Nombre as 'Usuario',
+	       (cast(c.NombreUsuario as varchar) + ' - ' + u.Nombre) as 'Usuario',
 	       c.SubTotal as 'SubTotal',
 	       c.TotalPagar as 'Total Pagar',
 	       c.Estado
@@ -695,7 +721,7 @@ create procedure SpSelectAllControlInventario
 as
 begin
 	select ci.ControlInvId as 'Código Control',
-	       u.Nombre as 'Usuario',
+	       (cast(ci.NombreUsuario as varchar) + ' - ' + u.Nombre) as 'Usuario',
 	       ci.FechaHora as 'Fecha Hora',
 	       ci.CantProducto as 'Cantidad Productos',
 	       ci.Observacion as 'Observación',
@@ -730,6 +756,29 @@ as
 begin
 	insert into DET_CONTROL_INV (Cantidad, Observacion, NombreControlInv)
 	values (@Cantidad, @Observacion, @NombreControlInv);
+end;
+
+go
+create procedure SpSelectAllDetControlInv
+as
+begin
+	select DetControlInvId as 'Código',
+	       Cantidad as 'Cantidad',
+	       Observacion as 'Observación',
+	       NombreControlInv as 'Código Control'
+	from DET_CONTROL_INV
+	order by DetControlInvId desc;
+end;
+
+go
+create procedure SpSelectAllInventario
+as
+begin
+	select InventarioId as 'Código',
+	       Existencias as 'Existencias',
+	       FechaActualizacion as 'Fecha Actualización'
+	from INVENTARIO
+	order by FechaActualizacion desc;
 end;
 
 

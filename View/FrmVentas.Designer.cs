@@ -294,7 +294,7 @@
             // colIdVenta
             // 
             colIdVenta.DataPropertyName = "IdVenta";
-            colIdVenta.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colIdVenta.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colIdVenta.FillWeight = 55F;
             colIdVenta.HeaderText = "N° venta";
             colIdVenta.MinimumWidth = 6;
@@ -307,7 +307,7 @@
             dataGridViewCellStyle3.Format = "dd/MM/yyyy";
             dataGridViewCellStyle3.NullValue = null;
             colFecha.DefaultCellStyle = dataGridViewCellStyle3;
-            colFecha.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colFecha.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colFecha.FillWeight = 70F;
             colFecha.HeaderText = "Fecha";
             colFecha.MinimumWidth = 6;
@@ -335,7 +335,7 @@
             // colEstado
             // 
             colEstado.DataPropertyName = "Estado";
-            colEstado.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
+            colEstado.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colEstado.FillWeight = 75F;
             colEstado.HeaderText = "Estado";
             colEstado.MinimumWidth = 6;

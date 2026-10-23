@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using Microsoft.Data.SqlClient;
 using NutriSport.Entities;
 
@@ -12,22 +13,25 @@ namespace NutriSport.DAL
             var lista = new List<Compra>();
             using (var conn = BDComun.ObtenerConexion())
             {
-                string query = "SELECT CompraId, FechaHora, NombreProveedor, NumFact, NombreUsuario, SubTotal, TotalPagar, Estado FROM COMPRA";
-                using (var cmd = new SqlCommand(query, conn))
+                using (var cmd = BDComun.ObtenerComando("SpSelectAllCompra", conn))
                 {
                     using (var reader = cmd.ExecuteReader())
                     {
                         while (reader.Read())
                         {
+                            // 'Proveedor' y 'Usuario' vienen como "Código - Nombre"
+                            string proveedor = reader["Proveedor"].ToString() ?? string.Empty;
+                            string usuario = reader["Usuario"].ToString() ?? string.Empty;
+
                             lista.Add(new Compra
                             {
-                                CompraId = Convert.ToInt32(reader["CompraId"]),
-                                FechaHora = Convert.ToDateTime(reader["FechaHora"]),
-                                NombreProveedor = Convert.ToInt16(reader["NombreProveedor"]),
-                                NumFact = Convert.ToInt32(reader["NumFact"]),
-                                NombreUsuario = Convert.ToInt32(reader["NombreUsuario"]),
+                                CompraId = Convert.ToInt32(reader["Código Compra"]),
+                                FechaHora = Convert.ToDateTime(reader["Fecha Hora"]),
+                                NombreProveedor = Convert.ToInt16(proveedor.Substring(0, proveedor.IndexOf(" - "))),
+                                NumFact = Convert.ToInt32(reader["N° Factura"]),
+                                NombreUsuario = Convert.ToInt32(usuario.Substring(0, usuario.IndexOf(" - "))),
                                 SubTotal = Convert.ToDecimal(reader["SubTotal"]),
-                                TotalPagar = Convert.ToDecimal(reader["TotalPagar"]),
+                                TotalPagar = Convert.ToDecimal(reader["Total Pagar"]),
                                 Estado = reader["Estado"].ToString() ?? "Completada"
                             });
                         }
@@ -41,9 +45,7 @@ namespace NutriSport.DAL
         {
             using (var conn = BDComun.ObtenerConexion())
             {
-                string query = "INSERT INTO COMPRA (FechaHora, NombreProveedor, NumFact, NombreUsuario, SubTotal, TotalPagar, Estado) " +
-                               "VALUES (@FechaHora, @NombreProveedor, @NumFact, @NombreUsuario, @SubTotal, @TotalPagar, @Estado)";
-                using (var cmd = new SqlCommand(query, conn))
+                using (var cmd = BDComun.ObtenerComando("SpInsertCompra", conn))
                 {
                     cmd.Parameters.AddWithValue("@FechaHora", entidad.FechaHora);
                     cmd.Parameters.AddWithValue("@NombreProveedor", entidad.NombreProveedor);
@@ -52,6 +54,7 @@ namespace NutriSport.DAL
                     cmd.Parameters.AddWithValue("@SubTotal", entidad.SubTotal);
                     cmd.Parameters.AddWithValue("@TotalPagar", entidad.TotalPagar);
                     cmd.Parameters.AddWithValue("@Estado", entidad.Estado);
+                    cmd.Parameters.Add(new SqlParameter("@CompraIdGenerada", SqlDbType.Int) { Direction = ParameterDirection.Output });
                     return cmd.ExecuteNonQuery();
                 }
             }
