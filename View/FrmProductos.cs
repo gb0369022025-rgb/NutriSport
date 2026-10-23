@@ -21,8 +21,8 @@ namespace View
             MostrarOcupado(true, "Cargando productos...");
             try
             {
-                Task<List<Categoria>> tareaCategorias = Task.Run(() => Categoria_BL.ObtenerTodos());
-                Task<List<Producto>> tareaProductos = Task.Run(() => Producto_BL.ObtenerTodos());
+                Task<List<Categoria>> tareaCategorias = EnSegundoPlano(() => Categoria_BL.ObtenerTodos());
+                Task<List<Producto>> tareaProductos = EnSegundoPlano(() => Producto_BL.ObtenerTodos());
                 await Task.WhenAll(tareaCategorias, tareaProductos);
                 if (IsDisposed) return;
 
@@ -51,7 +51,7 @@ namespace View
             MostrarOcupado(true, "Cargando productos...");
             try
             {
-                List<Producto> productos = await Task.Run(() => texto.Length == 0
+                List<Producto> productos = await EnSegundoPlano(() => texto.Length == 0
                     ? Producto_BL.ObtenerTodos()
                     : Producto_BL.BuscarPorNombre(texto));
                 if (IsDisposed) return;
@@ -75,6 +75,23 @@ namespace View
             dgvProductos.DataSource = productos;
             string cantidad = productos.Count == 1 ? "1 producto" : $"{productos.Count} productos";
             lblEstado.Text = texto.Length == 0 ? cantidad + " registrados" : $"{cantidad} encontrados para \"{texto}\"";
+        }
+
+        // Ejecuta la consulta en segundo plano. Si falla, el error se entrega al formulario como resultado
+        // en lugar de lanzarse dentro del hilo; así Visual Studio no pausa el programa y se muestra el mensaje.
+        private static Task<T> EnSegundoPlano<T>(Func<T> consulta)
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    return Task.FromResult(consulta());
+                }
+                catch (Exception ex)
+                {
+                    return Task.FromException<T>(ex);
+                }
+            });
         }
 
         private void MostrarOcupado(bool ocupado, string? mensaje = null)
@@ -147,7 +164,7 @@ namespace View
             MostrarOcupado(true, "Guardando...");
             try
             {
-                int filas = await Task.Run(() => Producto_BL.Agregar(producto));
+                int filas = await EnSegundoPlano(() => Producto_BL.Agregar(producto));
                 if (IsDisposed) return;
                 if (filas > 0)
                 {
@@ -184,7 +201,7 @@ namespace View
             MostrarOcupado(true, "Guardando...");
             try
             {
-                int filas = await Task.Run(() => Producto_BL.Modificar(producto));
+                int filas = await EnSegundoPlano(() => Producto_BL.Modificar(producto));
                 if (IsDisposed) return;
                 if (filas > 0)
                 {
@@ -206,6 +223,12 @@ namespace View
             {
                 if (!IsDisposed) MostrarOcupado(false);
             }
+        }
+
+        // Cierra esta ventana y regresa al formulario principal
+        private void btnVolver_Click(object sender, EventArgs e)
+        {
+            Close();
         }
 
         private void btnLimpiar_Click(object sender, EventArgs e)

@@ -21,9 +21,9 @@ namespace View
             MostrarOcupado(true, "Cargando compras...");
             try
             {
-                Task<List<Proveedor>> tareaProveedores = Task.Run(() => Proveedor_BL.ObtenerTodos());
-                Task<List<Usuario>> tareaUsuarios = Task.Run(() => Usuario_BL.ObtenerTodos());
-                Task<List<Compra>> tareaCompras = Task.Run(() => Compra_BL.ObtenerTodos());
+                Task<List<Proveedor>> tareaProveedores = EnSegundoPlano(() => Proveedor_BL.ObtenerTodos());
+                Task<List<Usuario>> tareaUsuarios = EnSegundoPlano(() => Usuario_BL.ObtenerTodos());
+                Task<List<Compra>> tareaCompras = EnSegundoPlano(() => Compra_BL.ObtenerTodos());
                 await Task.WhenAll(tareaProveedores, tareaUsuarios, tareaCompras);
                 if (IsDisposed) return;
 
@@ -58,7 +58,7 @@ namespace View
             MostrarOcupado(true, "Cargando compras...");
             try
             {
-                List<Compra> compras = await Task.Run(() => Compra_BL.ObtenerTodos());
+                List<Compra> compras = await EnSegundoPlano(() => Compra_BL.ObtenerTodos());
                 if (IsDisposed) return;
                 MostrarCompras(compras);
             }
@@ -91,6 +91,23 @@ namespace View
                 })
                 .ToList();
             lblEstado.Text = compras.Count == 1 ? "1 compra registrada" : $"{compras.Count} compras registradas";
+        }
+
+        // Ejecuta la consulta en segundo plano. Si falla, el error se entrega al formulario como resultado
+        // en lugar de lanzarse dentro del hilo; así Visual Studio no pausa el programa y se muestra el mensaje.
+        private static Task<T> EnSegundoPlano<T>(Func<T> consulta)
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    return Task.FromResult(consulta());
+                }
+                catch (Exception ex)
+                {
+                    return Task.FromException<T>(ex);
+                }
+            });
         }
 
         private void MostrarOcupado(bool ocupado, string? mensaje = null)
@@ -166,7 +183,7 @@ namespace View
             MostrarOcupado(true, "Guardando...");
             try
             {
-                int filas = await Task.Run(() => Compra_BL.Agregar(compra));
+                int filas = await EnSegundoPlano(() => Compra_BL.Agregar(compra));
                 if (IsDisposed) return;
                 if (filas > 0)
                 {
@@ -188,6 +205,12 @@ namespace View
             {
                 if (!IsDisposed) MostrarOcupado(false);
             }
+        }
+
+        // Cierra esta ventana y regresa al formulario principal
+        private void btnVolver_Click(object sender, EventArgs e)
+        {
+            Close();
         }
 
         private void btnLimpiar_Click(object sender, EventArgs e)

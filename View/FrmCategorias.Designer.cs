@@ -33,6 +33,7 @@
             panelSuperior = new Panel();
             lblTitulo = new Label();
             lblSeccion = new Label();
+            btnVolver = new Button();
             panelInferior = new Panel();
             lblEstado = new Label();
             panelDatos = new Panel();
@@ -56,13 +57,14 @@
             // panelSuperior
             // 
             panelSuperior.BackColor = Color.White;
+            panelSuperior.Controls.Add(btnVolver);
             panelSuperior.Controls.Add(lblSeccion);
             panelSuperior.Controls.Add(lblTitulo);
             panelSuperior.Dock = DockStyle.Top;
             panelSuperior.Location = new Point(0, 0);
             panelSuperior.Name = "panelSuperior";
             panelSuperior.Size = new Size(1082, 60);
-            panelSuperior.TabIndex = 0;
+            panelSuperior.TabIndex = 4;
             // 
             // lblTitulo
             // 
@@ -78,13 +80,26 @@
             // 
             lblSeccion.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             lblSeccion.ForeColor = Color.FromArgb(120, 130, 150);
-            lblSeccion.Location = new Point(762, 20);
+            lblSeccion.Location = new Point(612, 20);
             lblSeccion.Name = "lblSeccion";
             lblSeccion.Size = new Size(300, 20);
             lblSeccion.TabIndex = 1;
             lblSeccion.Text = "INVENTARIO & PRODUCTOS";
             lblSeccion.TextAlign = ContentAlignment.MiddleRight;
             lblSeccion.UseMnemonic = false;
+            // 
+            // btnVolver
+            // 
+            btnVolver.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnVolver.BackColor = Color.FromArgb(230, 235, 240);
+            btnVolver.FlatStyle = FlatStyle.Flat;
+            btnVolver.Location = new Point(932, 11);
+            btnVolver.Name = "btnVolver";
+            btnVolver.Size = new Size(130, 38);
+            btnVolver.TabIndex = 2;
+            btnVolver.Text = "Volver al menú";
+            btnVolver.UseVisualStyleBackColor = false;
+            btnVolver.Click += btnVolver_Click;
             // 
             // panelInferior
             // 
@@ -298,6 +313,7 @@
         private Panel panelSuperior;
         private Label lblTitulo;
         private Label lblSeccion;
+        private Button btnVolver;
         private Panel panelInferior;
         private Label lblEstado;
         private Panel panelDatos;

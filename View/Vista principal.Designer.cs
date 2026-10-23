@@ -128,6 +128,7 @@
             btnDashboard.Text = "Dashboard";
             btnDashboard.TextAlign = ContentAlignment.MiddleLeft;
             btnDashboard.UseVisualStyleBackColor = false;
+            btnDashboard.Click += btnDashboard_Click;
             // 
             // lblCatComercial
             // 
@@ -379,7 +380,7 @@
             label1.Name = "label1";
             label1.Size = new Size(144, 41);
             label1.TabIndex = 1;
-            label1.Text = "$1,250.00";
+            label1.Text = "—";
             // 
             // panel1
             // 
@@ -408,7 +409,7 @@
             label3.Name = "label3";
             label3.Size = new Size(50, 41);
             label3.TabIndex = 2;
-            label3.Text = "15";
+            label3.Text = "—";
             // 
             // panel2
             // 
@@ -427,7 +428,7 @@
             label2.Name = "label2";
             label2.Size = new Size(140, 32);
             label2.TabIndex = 2;
-            label2.Text = "8 Productos";
+            label2.Text = "—";
             // 
             // label4
             // 
@@ -470,6 +471,7 @@
             button1.TabIndex = 1;
             button1.Text = "Nueva Venta";
             button1.UseVisualStyleBackColor = false;
+            button1.Click += button1_Click;
             // 
             // button2
             // 
@@ -481,6 +483,7 @@
             button2.TabIndex = 2;
             button2.Text = "Agregar Cliente";
             button2.UseVisualStyleBackColor = false;
+            button2.Click += button2_Click;
             // 
             // NutriSport
             // 
@@ -498,6 +501,7 @@
             Name = "NutriSport";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "NutriSport - Sistema de Gestión";
+            Load += NutriSport_Load;
             panelLateral.ResumeLayout(false);
             panelLateral.PerformLayout();
             panelSuperior.ResumeLayout(false);

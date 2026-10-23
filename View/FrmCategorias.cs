@@ -26,7 +26,7 @@ namespace View
             MostrarOcupado(true, "Cargando categorías...");
             try
             {
-                List<Categoria> categorias = await Task.Run(() => Categoria_BL.ObtenerTodos());
+                List<Categoria> categorias = await EnSegundoPlano(() => Categoria_BL.ObtenerTodos());
                 if (IsDisposed) return;
                 dgvCategorias.DataSource = categorias;
                 lblEstado.Text = categorias.Count == 1 ? "1 categoría registrada" : $"{categorias.Count} categorías registradas";
@@ -42,6 +42,23 @@ namespace View
             {
                 if (!IsDisposed) MostrarOcupado(false);
             }
+        }
+
+        // Ejecuta la consulta en segundo plano. Si falla, el error se entrega al formulario como resultado
+        // en lugar de lanzarse dentro del hilo; así Visual Studio no pausa el programa y se muestra el mensaje.
+        private static Task<T> EnSegundoPlano<T>(Func<T> consulta)
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    return Task.FromResult(consulta());
+                }
+                catch (Exception ex)
+                {
+                    return Task.FromException<T>(ex);
+                }
+            });
         }
 
         private void MostrarOcupado(bool ocupado, string? mensaje = null)
@@ -80,7 +97,7 @@ namespace View
             MostrarOcupado(true, "Guardando...");
             try
             {
-                int filas = await Task.Run(() => Categoria_BL.Agregar(categoria));
+                int filas = await EnSegundoPlano(() => Categoria_BL.Agregar(categoria));
                 if (IsDisposed) return;
                 if (filas > 0)
                 {
@@ -121,7 +138,7 @@ namespace View
             MostrarOcupado(true, "Guardando...");
             try
             {
-                int filas = await Task.Run(() => Categoria_BL.Modificar(categoria));
+                int filas = await EnSegundoPlano(() => Categoria_BL.Modificar(categoria));
                 if (IsDisposed) return;
                 if (filas > 0)
                 {
@@ -161,7 +178,7 @@ namespace View
             MostrarOcupado(true, "Eliminando...");
             try
             {
-                int filas = await Task.Run(() => Categoria_BL.Eliminar(id));
+                int filas = await EnSegundoPlano(() => Categoria_BL.Eliminar(id));
                 if (IsDisposed) return;
                 MessageBox.Show(filas > 0 ? "Categoría eliminada." : "La categoría ya no existe. Se actualizará la lista.",
                     Titulo, MessageBoxButtons.OK, filas > 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
@@ -177,6 +194,12 @@ namespace View
             {
                 if (!IsDisposed) MostrarOcupado(false);
             }
+        }
+
+        // Cierra esta ventana y regresa al formulario principal
+        private void btnVolver_Click(object sender, EventArgs e)
+        {
+            Close();
         }
 
         private void btnLimpiar_Click(object sender, EventArgs e)

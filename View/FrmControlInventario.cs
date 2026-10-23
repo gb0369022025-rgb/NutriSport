@@ -20,8 +20,8 @@ namespace View
             MostrarOcupado(true, "Cargando controles...");
             try
             {
-                Task<List<Usuario>> tareaUsuarios = Task.Run(() => Usuario_BL.ObtenerTodos());
-                Task<List<Ctrl_Inventario>> tareaControles = Task.Run(() => Ctrl_Inventario_BL.ObtenerTodos());
+                Task<List<Usuario>> tareaUsuarios = EnSegundoPlano(() => Usuario_BL.ObtenerTodos());
+                Task<List<Ctrl_Inventario>> tareaControles = EnSegundoPlano(() => Ctrl_Inventario_BL.ObtenerTodos());
                 await Task.WhenAll(tareaUsuarios, tareaControles);
                 if (IsDisposed) return;
 
@@ -50,7 +50,7 @@ namespace View
             MostrarOcupado(true, "Cargando controles...");
             try
             {
-                List<Ctrl_Inventario> controles = await Task.Run(() => Ctrl_Inventario_BL.ObtenerTodos());
+                List<Ctrl_Inventario> controles = await EnSegundoPlano(() => Ctrl_Inventario_BL.ObtenerTodos());
                 if (IsDisposed) return;
                 MostrarControles(controles);
             }
@@ -81,6 +81,23 @@ namespace View
                 })
                 .ToList();
             lblEstado.Text = controles.Count == 1 ? "1 control registrado" : $"{controles.Count} controles registrados";
+        }
+
+        // Ejecuta la consulta en segundo plano. Si falla, el error se entrega al formulario como resultado
+        // en lugar de lanzarse dentro del hilo; así Visual Studio no pausa el programa y se muestra el mensaje.
+        private static Task<T> EnSegundoPlano<T>(Func<T> consulta)
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    return Task.FromResult(consulta());
+                }
+                catch (Exception ex)
+                {
+                    return Task.FromException<T>(ex);
+                }
+            });
         }
 
         private void MostrarOcupado(bool ocupado, string? mensaje = null)
@@ -134,7 +151,7 @@ namespace View
             MostrarOcupado(true, "Guardando...");
             try
             {
-                int filas = await Task.Run(() => Ctrl_Inventario_BL.Agregar(control));
+                int filas = await EnSegundoPlano(() => Ctrl_Inventario_BL.Agregar(control));
                 if (IsDisposed) return;
                 if (filas > 0)
                 {
@@ -156,6 +173,12 @@ namespace View
             {
                 if (!IsDisposed) MostrarOcupado(false);
             }
+        }
+
+        // Cierra esta ventana y regresa al formulario principal
+        private void btnVolver_Click(object sender, EventArgs e)
+        {
+            Close();
         }
 
         private void btnLimpiar_Click(object sender, EventArgs e)

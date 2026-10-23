@@ -25,7 +25,7 @@ namespace View
             MostrarOcupado(true, "Cargando pedidos...");
             try
             {
-                List<Pedido> pedidos = await Task.Run(() => Pedido_BL.ObtenerTodos());
+                List<Pedido> pedidos = await EnSegundoPlano(() => Pedido_BL.ObtenerTodos());
                 if (IsDisposed) return;
                 dgvPedidos.DataSource = pedidos;
                 int pendientes = pedidos.Count(p => p.Estado == "Pendiente");
@@ -43,6 +43,23 @@ namespace View
             {
                 if (!IsDisposed) MostrarOcupado(false);
             }
+        }
+
+        // Ejecuta la consulta en segundo plano. Si falla, el error se entrega al formulario como resultado
+        // en lugar de lanzarse dentro del hilo; así Visual Studio no pausa el programa y se muestra el mensaje.
+        private static Task<T> EnSegundoPlano<T>(Func<T> consulta)
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    return Task.FromResult(consulta());
+                }
+                catch (Exception ex)
+                {
+                    return Task.FromException<T>(ex);
+                }
+            });
         }
 
         private void MostrarOcupado(bool ocupado, string? mensaje = null)
@@ -71,7 +88,7 @@ namespace View
             MostrarOcupado(true, "Guardando...");
             try
             {
-                int filas = await Task.Run(() => Pedido_BL.Agregar(pedido));
+                int filas = await EnSegundoPlano(() => Pedido_BL.Agregar(pedido));
                 if (IsDisposed) return;
                 if (filas > 0)
                 {
@@ -93,6 +110,12 @@ namespace View
             {
                 if (!IsDisposed) MostrarOcupado(false);
             }
+        }
+
+        // Cierra esta ventana y regresa al formulario principal
+        private void btnVolver_Click(object sender, EventArgs e)
+        {
+            Close();
         }
 
         private void btnLimpiar_Click(object sender, EventArgs e)

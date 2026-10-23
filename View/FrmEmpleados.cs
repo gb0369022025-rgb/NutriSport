@@ -25,7 +25,7 @@ namespace View
             MostrarOcupado(true, "Cargando empleados...");
             try
             {
-                List<Empleado> empleados = await Task.Run(() => Empleado_BL.ObtenerTodos());
+                List<Empleado> empleados = await EnSegundoPlano(() => Empleado_BL.ObtenerTodos());
                 if (IsDisposed) return;
                 dgvEmpleados.DataSource = empleados;
                 lblEstado.Text = empleados.Count == 1 ? "1 empleado registrado" : $"{empleados.Count} empleados registrados";
@@ -41,6 +41,23 @@ namespace View
             {
                 if (!IsDisposed) MostrarOcupado(false);
             }
+        }
+
+        // Ejecuta la consulta en segundo plano. Si falla, el error se entrega al formulario como resultado
+        // en lugar de lanzarse dentro del hilo; así Visual Studio no pausa el programa y se muestra el mensaje.
+        private static Task<T> EnSegundoPlano<T>(Func<T> consulta)
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    return Task.FromResult(consulta());
+                }
+                catch (Exception ex)
+                {
+                    return Task.FromException<T>(ex);
+                }
+            });
         }
 
         private void MostrarOcupado(bool ocupado, string? mensaje = null)
@@ -106,7 +123,7 @@ namespace View
             MostrarOcupado(true, "Guardando...");
             try
             {
-                int filas = await Task.Run(() => Empleado_BL.Agregar(empleado));
+                int filas = await EnSegundoPlano(() => Empleado_BL.Agregar(empleado));
                 if (IsDisposed) return;
                 if (filas > 0)
                 {
@@ -129,6 +146,12 @@ namespace View
             {
                 if (!IsDisposed) MostrarOcupado(false);
             }
+        }
+
+        // Cierra esta ventana y regresa al formulario principal
+        private void btnVolver_Click(object sender, EventArgs e)
+        {
+            Close();
         }
 
         private void btnLimpiar_Click(object sender, EventArgs e)

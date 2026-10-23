@@ -20,8 +20,8 @@ namespace View
             MostrarOcupado(true, "Cargando ventas...");
             try
             {
-                Task<List<Cliente>> tareaClientes = Task.Run(() => Cliente_BL.ObtenerTodos());
-                Task<List<Venta>> tareaVentas = Task.Run(() => Venta_BL.ObtenerTodos());
+                Task<List<Cliente>> tareaClientes = EnSegundoPlano(() => Cliente_BL.ObtenerTodos());
+                Task<List<Venta>> tareaVentas = EnSegundoPlano(() => Venta_BL.ObtenerTodos());
                 await Task.WhenAll(tareaClientes, tareaVentas);
                 if (IsDisposed) return;
 
@@ -52,7 +52,7 @@ namespace View
             MostrarOcupado(true, "Cargando ventas...");
             try
             {
-                List<Venta> ventas = await Task.Run(() => Venta_BL.ObtenerTodos());
+                List<Venta> ventas = await EnSegundoPlano(() => Venta_BL.ObtenerTodos());
                 if (IsDisposed) return;
                 MostrarVentas(ventas);
             }
@@ -89,6 +89,23 @@ namespace View
             if (!clienteId.HasValue) return "Sin cliente";
             Cliente? cliente = clientes.FirstOrDefault(c => c.ClienteId == clienteId.Value);
             return cliente == null ? $"Cliente {clienteId.Value}" : $"{cliente.Nombre} {cliente.Apellido}".Trim();
+        }
+
+        // Ejecuta la consulta en segundo plano. Si falla, el error se entrega al formulario como resultado
+        // en lugar de lanzarse dentro del hilo; así Visual Studio no pausa el programa y se muestra el mensaje.
+        private static Task<T> EnSegundoPlano<T>(Func<T> consulta)
+        {
+            return Task.Run(() =>
+            {
+                try
+                {
+                    return Task.FromResult(consulta());
+                }
+                catch (Exception ex)
+                {
+                    return Task.FromException<T>(ex);
+                }
+            });
         }
 
         private void MostrarOcupado(bool ocupado, string? mensaje = null)
@@ -146,7 +163,7 @@ namespace View
             MostrarOcupado(true, "Guardando...");
             try
             {
-                int filas = await Task.Run(() => Venta_BL.Agregar(venta));
+                int filas = await EnSegundoPlano(() => Venta_BL.Agregar(venta));
                 if (IsDisposed) return;
                 if (filas > 0)
                 {
@@ -168,6 +185,12 @@ namespace View
             {
                 if (!IsDisposed) MostrarOcupado(false);
             }
+        }
+
+        // Cierra esta ventana y regresa al formulario principal
+        private void btnVolver_Click(object sender, EventArgs e)
+        {
+            Close();
         }
 
         private void btnLimpiar_Click(object sender, EventArgs e)
