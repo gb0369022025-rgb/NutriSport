@@ -61,6 +61,7 @@
             label2 = new Label();
             label4 = new Label();
             panel3 = new Panel();
+            panelGrafico = new Panel();
             label5 = new Label();
             button1 = new Button();
             button2 = new Button();
@@ -378,13 +379,14 @@
             // 
             // panelCardPedidos
             // 
-            panelCardPedidos.BackColor = SystemColors.Control;
+            panelCardPedidos.BackColor = Color.White;
             panelCardPedidos.Controls.Add(label1);
             panelCardPedidos.Controls.Add(lblVentasTitulo);
             panelCardPedidos.Location = new Point(277, 128);
             panelCardPedidos.Name = "panelCardPedidos";
             panelCardPedidos.Size = new Size(230, 100);
             panelCardPedidos.TabIndex = 4;
+            panelCardPedidos.Paint += Tarjeta_Paint;
             // 
             // lblVentasTitulo
             // 
@@ -409,12 +411,14 @@
             // 
             // panel1
             // 
+            panel1.BackColor = Color.White;
             panel1.Controls.Add(label3);
             panel1.Controls.Add(lblPedidosTitulo);
             panel1.Location = new Point(561, 128);
             panel1.Name = "panel1";
             panel1.Size = new Size(230, 100);
             panel1.TabIndex = 5;
+            panel1.Paint += Tarjeta_Paint;
             // 
             // lblPedidosTitulo
             // 
@@ -438,12 +442,14 @@
             // 
             // panel2
             // 
+            panel2.BackColor = Color.White;
             panel2.Controls.Add(label2);
             panel2.Controls.Add(label4);
             panel2.Location = new Point(840, 128);
             panel2.Name = "panel2";
             panel2.Size = new Size(230, 100);
             panel2.TabIndex = 6;
+            panel2.Paint += Tarjeta_Paint;
             // 
             // label2
             // 
@@ -466,12 +472,21 @@
             label4.Text = "Stock Crítico";
             label4.Click += label4_Click;
             // 
+            // panelGrafico
+            // 
+            panelGrafico.BackColor = Color.White;
+            panelGrafico.Location = new Point(277, 246);
+            panelGrafico.Name = "panelGrafico";
+            panelGrafico.Size = new Size(793, 206);
+            panelGrafico.TabIndex = 20;
+            panelGrafico.Paint += panelGrafico_Paint;
+            // 
             // panel3
             // 
             panel3.Controls.Add(button2);
             panel3.Controls.Add(button1);
             panel3.Controls.Add(label5);
-            panel3.Location = new Point(277, 311);
+            panel3.Location = new Point(277, 462);
             panel3.Name = "panel3";
             panel3.Size = new Size(320, 100);
             panel3.TabIndex = 7;
@@ -515,6 +530,7 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1082, 603);
+            Controls.Add(panelGrafico);
             Controls.Add(panel3);
             Controls.Add(panel2);
             Controls.Add(panel1);
@@ -581,6 +597,7 @@
         private Label label2;
         private Label label4;
         private Panel panel3;
+        private Panel panelGrafico;
         private Button button2;
         private Button button1;
         private Label label5;

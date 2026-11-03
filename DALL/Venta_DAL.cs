@@ -88,5 +88,25 @@ namespace NutriSport.DAL
                 }
             }
         }
+
+        public static Dictionary<DateTime, decimal> ObtenerTotalesPorDia(DateTime desde)
+        {
+            var totales = new Dictionary<DateTime, decimal>();
+            using (var conn = BDComun.ObtenerConexion())
+            {
+                using (var cmd = BDComun.ObtenerComando("SpSelectVentasPorDia", conn))
+                {
+                    cmd.Parameters.AddWithValue("@Desde", desde.Date);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            totales[Convert.ToDateTime(reader["Fecha"]).Date] = Convert.ToDecimal(reader["Total"]);
+                        }
+                    }
+                }
+            }
+            return totales;
+        }
     }
 }
