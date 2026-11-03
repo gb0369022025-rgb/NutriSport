@@ -747,19 +747,6 @@ begin
 	commit transaction;
 end;
 
-go
-create procedure SpSelectVentasPorDia
-	@Desde date
-as
-begin
-	select v.FechaVenta as 'Fecha', sum(d.TotalPagar) as 'Total'
-	from VENTA v
-	inner join DETALLE_VENTA d on d.IdVenta = v.IdVenta
-	where v.FechaVenta >= @Desde and v.Estado <> 'Anulada'
-	group by v.FechaVenta
-	order by v.FechaVenta asc;
-end;
-
 
 go
 create procedure SpSelectAllCompra

@@ -25,10 +25,5 @@ namespace NutriSport.BL
         {
             return Venta_DAL.Registrar(entidad, detalle);
         }
-
-        public static Dictionary<DateTime, decimal> ObtenerTotalesPorDia(DateTime desde)
-        {
-            return Venta_DAL.ObtenerTotalesPorDia(desde);
-        }
     }
 }

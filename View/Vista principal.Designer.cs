@@ -51,6 +51,7 @@
             lblSistema = new Label();
             lblEstado = new Label();
             lblBienvenida = new Label();
+            lblResumen = new Label();
             panelCardPedidos = new Panel();
             lblVentasTitulo = new Label();
             label1 = new Label();
@@ -61,7 +62,6 @@
             label2 = new Label();
             label4 = new Label();
             panel3 = new Panel();
-            panelGrafico = new Panel();
             label5 = new Label();
             button1 = new Button();
             button2 = new Button();
@@ -369,13 +369,24 @@
             // 
             // lblBienvenida
             // 
+            // lblResumen
+            // 
+            lblResumen.AutoSize = true;
+            lblResumen.ForeColor = Color.Gray;
+            lblResumen.Location = new Point(277, 100);
+            lblResumen.Name = "lblResumen";
+            lblResumen.Size = new Size(116, 20);
+            lblResumen.TabIndex = 21;
+            lblResumen.Text = "Resumen de hoy";
+            // 
             lblBienvenida.AutoSize = true;
-            lblBienvenida.Font = new Font("Segoe UI", 12F);
-            lblBienvenida.Location = new Point(256, 70);
+            lblBienvenida.Font = new Font("Segoe UI", 15F, FontStyle.Bold);
+            lblBienvenida.ForeColor = Color.FromArgb(24, 30, 54);
+            lblBienvenida.Location = new Point(273, 64);
             lblBienvenida.Name = "lblBienvenida";
-            lblBienvenida.Size = new Size(421, 28);
+            lblBienvenida.Size = new Size(311, 35);
             lblBienvenida.TabIndex = 3;
-            lblBienvenida.Text = "BIENVENIDO AL DASHBOARD DE NUTRISPORT";
+            lblBienvenida.Text = "Bienvenido a NutriSport";
             // 
             // panelCardPedidos
             // 
@@ -472,21 +483,12 @@
             label4.Text = "Stock Crítico";
             label4.Click += label4_Click;
             // 
-            // panelGrafico
-            // 
-            panelGrafico.BackColor = Color.White;
-            panelGrafico.Location = new Point(277, 246);
-            panelGrafico.Name = "panelGrafico";
-            panelGrafico.Size = new Size(793, 206);
-            panelGrafico.TabIndex = 20;
-            panelGrafico.Paint += panelGrafico_Paint;
-            // 
             // panel3
             // 
             panel3.Controls.Add(button2);
             panel3.Controls.Add(button1);
             panel3.Controls.Add(label5);
-            panel3.Location = new Point(277, 462);
+            panel3.Location = new Point(277, 311);
             panel3.Name = "panel3";
             panel3.Size = new Size(320, 100);
             panel3.TabIndex = 7;
@@ -530,11 +532,11 @@
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1082, 603);
-            Controls.Add(panelGrafico);
             Controls.Add(panel3);
             Controls.Add(panel2);
             Controls.Add(panel1);
             Controls.Add(panelCardPedidos);
+            Controls.Add(lblResumen);
             Controls.Add(lblBienvenida);
             Controls.Add(panelInferior);
             Controls.Add(panelSuperior);
@@ -587,6 +589,7 @@
         private Label lblSistema;
         private Label lblEstado;
         private Label lblBienvenida;
+        private Label lblResumen;
         private Panel panelCardPedidos;
         private Label label1;
         private Label lblVentasTitulo;
@@ -597,7 +600,6 @@
         private Label label2;
         private Label label4;
         private Panel panel3;
-        private Panel panelGrafico;
         private Button button2;
         private Button button1;
         private Label label5;
