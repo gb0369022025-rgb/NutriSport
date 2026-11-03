@@ -18,7 +18,6 @@ namespace View
             dgvProductos.AutoGenerateColumns = false;
         }
 
-        // Categorías y productos se consultan al mismo tiempo, en segundo plano
         private async void FrmProductos_Load(object sender, EventArgs e)
         {
             MostrarOcupado(true, "Cargando productos...");
@@ -80,8 +79,6 @@ namespace View
             lblEstado.Text = texto.Length == 0 ? cantidad + " registrados" : $"{cantidad} encontrados para \"{texto}\"";
         }
 
-        // Ejecuta la consulta en segundo plano. Si falla, el error se entrega al formulario como resultado
-        // en lugar de lanzarse dentro del hilo; así Visual Studio no pausa el programa y se muestra el mensaje.
         private static Task<T> EnSegundoPlano<T>(Func<T> consulta)
         {
             return Task.Run(() =>
@@ -125,6 +122,12 @@ namespace View
                 cboCategoria.Focus();
                 return false;
             }
+            if (string.IsNullOrWhiteSpace(txtCodigoBarras.Text))
+            {
+                MessageBox.Show("Escanea o escribe el código de barras del producto.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCodigoBarras.Focus();
+                return false;
+            }
             return true;
         }
 
@@ -137,7 +140,7 @@ namespace View
                 Precio = nudPrecio.Value,
                 Existencia = (int)nudExistencia.Value,
                 CategoriaId = Convert.ToInt32(cboCategoria.SelectedValue),
-                CodigoBarras = string.IsNullOrWhiteSpace(txtCodigoBarras.Text) ? null : txtCodigoBarras.Text.Trim()
+                CodigoBarras = txtCodigoBarras.Text.Trim()
             };
         }
 
@@ -155,7 +158,6 @@ namespace View
             txtNombre.Focus();
         }
 
-        // En un ComboBox enlazado a datos, WinForms solo lo deja vacío si se asigna -1 dos veces
         private static void VaciarSeleccion(ComboBox combo)
         {
             combo.SelectedIndex = -1;
@@ -265,7 +267,6 @@ namespace View
             }
         }
 
-        // Cierra esta ventana y regresa al formulario principal
         private void btnVolver_Click(object sender, EventArgs e)
         {
             Close();
@@ -290,34 +291,32 @@ namespace View
             }
         }
 
-        // Si el texto es un código de barras (lo que escribe el lector), lo busca por coincidencia exacta;
-        // si es un nombre, hace la búsqueda por nombre de siempre
         private async Task BuscarAsync()
         {
             string texto = txtBuscar.Text.Trim();
-            if (!EsCodigoDeBarras(texto))
+            if (texto.Length == 0 || texto.Contains(' '))
             {
                 await CargarProductosAsync();
                 return;
             }
 
-            MostrarOcupado(true, "Buscando código...");
+            MostrarOcupado(true, "Buscando...");
+            Producto? producto = null;
+            bool fallo = false;
             try
             {
-                Producto? producto = await EnSegundoPlano(() => Producto_BL.BuscarPorCodigoBarras(texto));
+                producto = await EnSegundoPlano(() => Producto_BL.BuscarPorCodigoBarras(texto));
                 if (IsDisposed) return;
-                if (producto == null)
+                if (producto != null)
                 {
-                    lblEstado.Text = $"Ningún producto tiene el código {texto}";
-                    MessageBox.Show($"Ningún producto tiene el código de barras {texto}.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
+                    dgvProductos.DataSource = new List<Producto> { producto };
+                    MostrarEnCampos(producto);
+                    lblEstado.Text = $"Código {texto}: {producto.NombreProducto}";
                 }
-                dgvProductos.DataSource = new List<Producto> { producto };
-                MostrarEnCampos(producto);
-                lblEstado.Text = $"Código {texto}: {producto.NombreProducto}";
             }
             catch (Exception ex)
             {
+                fallo = true;
                 if (IsDisposed) return;
                 MessageBox.Show("No se pudo buscar el código de barras.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -326,51 +325,25 @@ namespace View
                 if (!IsDisposed)
                 {
                     MostrarOcupado(false);
-                    txtBuscar.SelectAll();  // el siguiente escaneo reemplaza el texto
+                    txtBuscar.SelectAll();
                     txtBuscar.Focus();
                 }
             }
+
+            if (producto == null && !fallo && !IsDisposed) await CargarProductosAsync();
         }
 
-        // Un código de barras no tiene espacios y es solo números (códigos de fábrica) o empieza con NS (códigos internos)
-        private static bool EsCodigoDeBarras(string texto)
-        {
-            return texto.Length >= 6 && !texto.Contains(' ') && (texto.All(char.IsDigit) || texto.StartsWith("NS"));
-        }
-
-        // El lector termina cada lectura con Enter; aquí se ignora para que no suene el aviso de Windows
         private void txtCodigoBarras_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Enter) e.SuppressKeyPress = true;
         }
 
-        // Código interno para productos sin código de fábrica: NS + número del producto con 6 dígitos (NS000007)
-        private void btnGenerarCodigo_Click(object sender, EventArgs e)
-        {
-            if (productoIdSeleccionado == 0)
-            {
-                MessageBox.Show("Primero agrega el producto y selecciónalo en la lista: el código interno se forma con su número.",
-                    Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            if (!string.IsNullOrWhiteSpace(txtCodigoBarras.Text) &&
-                MessageBox.Show($"Este producto ya tiene el código {txtCodigoBarras.Text.Trim()}. ¿Reemplazarlo por uno interno?",
-                    Titulo, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
-            {
-                return;
-            }
-
-            txtCodigoBarras.Text = $"NS{productoIdSeleccionado:D6}";
-            MessageBox.Show("Código generado. Haz clic en Modificar para guardarlo.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-
-        // Dibuja la etiqueta (nombre, precio y código de barras Code 128) y abre la vista previa para imprimirla
         private void btnImprimirEtiqueta_Click(object sender, EventArgs e)
         {
             string codigo = txtCodigoBarras.Text.Trim();
             if (codigo.Length == 0)
             {
-                MessageBox.Show("El producto no tiene código de barras. Escanéalo o genéralo, y guárdalo con Modificar.",
+                MessageBox.Show("Selecciona un producto con código de barras para imprimir su etiqueta.",
                     Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
@@ -388,11 +361,11 @@ namespace View
             documento.PrintPage += (s, ev) =>
             {
                 Graphics g = ev.Graphics!;
-                g.InterpolationMode = InterpolationMode.NearestNeighbor;  // barras nítidas para que el lector las lea
+                g.InterpolationMode = InterpolationMode.NearestNeighbor;
                 using var fuente = new Font("Segoe UI", 9F);
                 g.DrawString(nombre, fuente, Brushes.Black, 20, 20);
                 g.DrawString(precio, fuente, Brushes.Black, 20, 38);
-                g.DrawImage(imagen, 20, 60, 200, 70);  // unidades de 1/100 de pulgada: 5 x 1.8 cm
+                g.DrawImage(imagen, 20, 60, 200, 70);
             };
             using var vistaPrevia = new PrintPreviewDialog { Document = documento, Width = 800, Height = 600 };
             vistaPrevia.ShowDialog(this);
@@ -405,7 +378,6 @@ namespace View
             MostrarEnCampos(producto);
         }
 
-        // Carga el producto en los campos; lo usan el clic en la tabla y la búsqueda por escaneo
         private void MostrarEnCampos(Producto producto)
         {
             productoIdSeleccionado = producto.ProductoId;

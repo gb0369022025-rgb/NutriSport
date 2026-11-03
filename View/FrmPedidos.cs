@@ -21,7 +21,6 @@ namespace View
             LimpiarCampos();
         }
 
-        // Las consultas se hacen en segundo plano para que la ventana no se congele mientras responde la BD
         private async Task CargarPedidosAsync()
         {
             MostrarOcupado(true, "Cargando pedidos...");
@@ -47,8 +46,6 @@ namespace View
             }
         }
 
-        // Ejecuta la consulta en segundo plano. Si falla, el error se entrega al formulario como resultado
-        // en lugar de lanzarse dentro del hilo; así Visual Studio no pausa el programa y se muestra el mensaje.
         private static Task<T> EnSegundoPlano<T>(Func<T> consulta)
         {
             return Task.Run(() =>
@@ -83,7 +80,6 @@ namespace View
 
         private async void btnAgregar_Click(object sender, EventArgs e)
         {
-            // La fecha y hora del pedido las asigna SpInsertPedido al guardarlo
             var pedido = new Pedido
             {
                 NumeroPedido = (int)nudNumeroPedido.Value,
@@ -150,7 +146,6 @@ namespace View
             }
         }
 
-        // Cierra esta ventana y regresa al formulario principal
         private void btnVolver_Click(object sender, EventArgs e)
         {
             Close();

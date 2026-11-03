@@ -16,7 +16,6 @@ namespace View
             dgvUsuarios.AutoGenerateColumns = false;
         }
 
-        // Empleados y usuarios se consultan al mismo tiempo, en segundo plano
         private async void FrmUsuarios_Load(object sender, EventArgs e)
         {
             MostrarOcupado(true, "Cargando usuarios...");
@@ -76,8 +75,6 @@ namespace View
             lblEstado.Text = usuarios.Count == 1 ? "1 usuario registrado" : $"{usuarios.Count} usuarios registrados";
         }
 
-        // Ejecuta la consulta en segundo plano. Si falla, el error se entrega al formulario como resultado
-        // en lugar de lanzarse dentro del hilo; así Visual Studio no pausa el programa y se muestra el mensaje.
         private static Task<T> EnSegundoPlano<T>(Func<T> consulta)
         {
             return Task.Run(() =>
@@ -216,7 +213,6 @@ namespace View
             }
         }
 
-        // Cierra esta ventana y regresa al formulario principal
         private void btnVolver_Click(object sender, EventArgs e)
         {
             Close();

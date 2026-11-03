@@ -16,7 +16,6 @@ namespace View
             dgvControlInventario.AutoGenerateColumns = false;
         }
 
-        // Usuarios y controles se consultan al mismo tiempo, en segundo plano
         private async void FrmControlInventario_Load(object sender, EventArgs e)
         {
             MostrarOcupado(true, "Cargando controles...");
@@ -85,8 +84,6 @@ namespace View
             lblEstado.Text = controles.Count == 1 ? "1 control registrado" : $"{controles.Count} controles registrados";
         }
 
-        // Ejecuta la consulta en segundo plano. Si falla, el error se entrega al formulario como resultado
-        // en lugar de lanzarse dentro del hilo; así Visual Studio no pausa el programa y se muestra el mensaje.
         private static Task<T> EnSegundoPlano<T>(Func<T> consulta)
         {
             return Task.Run(() =>
@@ -133,7 +130,6 @@ namespace View
             cboUsuario.Focus();
         }
 
-        // En un ComboBox enlazado a datos, WinForms solo lo deja vacío si se asigna -1 dos veces
         private static void VaciarSeleccion(ComboBox combo)
         {
             combo.SelectedIndex = -1;
@@ -213,7 +209,6 @@ namespace View
             }
         }
 
-        // Cierra esta ventana y regresa al formulario principal
         private void btnVolver_Click(object sender, EventArgs e)
         {
             Close();

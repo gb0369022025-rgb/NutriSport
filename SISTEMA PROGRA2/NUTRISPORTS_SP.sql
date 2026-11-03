@@ -109,10 +109,10 @@ create procedure SpInsertProducto
 	@Precio money,
 	@Existencia int,
 	@CategoriaId int,
-	@CodigoBarras varchar(30) = null
+	@CodigoBarras varchar(30)
 as
 begin
-	set @CodigoBarras = nullif(ltrim(rtrim(@CodigoBarras)), '');
+	set @CodigoBarras = ltrim(rtrim(@CodigoBarras));
 
 	if exists(select * from PRODUCTO where Producto = @Producto)
 	   or exists(select * from PRODUCTO where CodigoBarras = @CodigoBarras)
@@ -133,10 +133,10 @@ create procedure SpUpdateProducto
 	@Precio money,
 	@Existencia int,
 	@CategoriaId int,
-	@CodigoBarras varchar(30) = null
+	@CodigoBarras varchar(30)
 as
 begin
-	set @CodigoBarras = nullif(ltrim(rtrim(@CodigoBarras)), '');
+	set @CodigoBarras = ltrim(rtrim(@CodigoBarras));
 
 	if exists (select * from PRODUCTO where Producto = @Producto and ProductoId <> @ProductoId)
 	   or exists (select * from PRODUCTO where CodigoBarras = @CodigoBarras and ProductoId <> @ProductoId)
@@ -700,7 +700,6 @@ begin
 	set xact_abort on;
 	begin transaction;
 
-	-- Devuelve a la existencia los productos de la venta
 	update p
 	set p.Existencia = p.Existencia + d.Cantidad
 	from PRODUCTO p
@@ -711,6 +710,39 @@ begin
 
 	delete from DETALLE_VENTA where IdVenta = @IdVenta;
 	delete from VENTA where IdVenta = @IdVenta;
+
+	commit transaction;
+end;
+
+go
+create procedure SpRegistrarVenta
+	@FechaVenta date,
+	@Estado varchar(20),
+	@Descripcion varchar(250),
+	@ClienteId int = null,
+	@Detalle nvarchar(max),
+	@IdVentaGenerado int output
+as
+begin
+	set xact_abort on;
+	begin transaction;
+
+	insert into VENTA (FechaVenta, Estado, Descripcion, ClienteId)
+	values (@FechaVenta, @Estado, @Descripcion, @ClienteId);
+
+	set @IdVentaGenerado = scope_identity();
+
+	insert into DETALLE_VENTA (Cantidad, PrecioUnitario, TotalPagar, IdVenta, ProductoId)
+	select d.Cantidad, p.Precio, d.Cantidad * p.Precio, @IdVentaGenerado, p.ProductoId
+	from openjson(@Detalle) with (ProductoId smallint, Cantidad smallint) d
+	inner join PRODUCTO p on p.ProductoId = d.ProductoId;
+
+	update p
+	set p.Existencia = p.Existencia - d.Cantidad
+	from PRODUCTO p
+	inner join (select ProductoId, sum(Cantidad) as Cantidad
+	            from openjson(@Detalle) with (ProductoId smallint, Cantidad smallint)
+	            group by ProductoId) d on d.ProductoId = p.ProductoId;
 
 	commit transaction;
 end;
@@ -781,7 +813,6 @@ begin
 	set xact_abort on;
 	begin transaction;
 
-	-- Quita de la existencia los productos que entraron con la compra
 	update p
 	set p.Existencia = p.Existencia - d.Cantidad
 	from PRODUCTO p

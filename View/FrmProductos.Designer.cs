@@ -48,7 +48,6 @@
             cboCategoria = new ComboBox();
             lblCodigoBarras = new Label();
             txtCodigoBarras = new TextBox();
-            btnGenerarCodigo = new Button();
             btnAgregar = new Button();
             btnModificar = new Button();
             btnEliminar = new Button();
@@ -149,7 +148,6 @@
             panelDatos.Controls.Add(btnEliminar);
             panelDatos.Controls.Add(btnModificar);
             panelDatos.Controls.Add(btnAgregar);
-            panelDatos.Controls.Add(btnGenerarCodigo);
             panelDatos.Controls.Add(lblCodigoBarras);
             panelDatos.Controls.Add(txtCodigoBarras);
             panelDatos.Controls.Add(lblCategoria);
@@ -257,21 +255,9 @@
             txtCodigoBarras.Location = new Point(20, 232);
             txtCodigoBarras.MaxLength = 30;
             txtCodigoBarras.Name = "txtCodigoBarras";
-            txtCodigoBarras.Size = new Size(155, 27);
+            txtCodigoBarras.Size = new Size(320, 27);
             txtCodigoBarras.KeyDown += txtCodigoBarras_KeyDown;
             txtCodigoBarras.TabIndex = 9;
-            // 
-            // btnGenerarCodigo
-            // 
-            btnGenerarCodigo.BackColor = Color.FromArgb(230, 235, 240);
-            btnGenerarCodigo.FlatStyle = FlatStyle.Flat;
-            btnGenerarCodigo.Location = new Point(185, 232);
-            btnGenerarCodigo.Name = "btnGenerarCodigo";
-            btnGenerarCodigo.Size = new Size(155, 29);
-            btnGenerarCodigo.TabIndex = 10;
-            btnGenerarCodigo.Text = "Generar código";
-            btnGenerarCodigo.UseVisualStyleBackColor = false;
-            btnGenerarCodigo.Click += btnGenerarCodigo_Click;
             // 
             // btnAgregar
             // 
@@ -279,10 +265,10 @@
             btnAgregar.FlatAppearance.BorderSize = 0;
             btnAgregar.FlatStyle = FlatStyle.Flat;
             btnAgregar.ForeColor = Color.White;
-            btnAgregar.Location = new Point(20, 285);
+            btnAgregar.Location = new Point(20, 283);
             btnAgregar.Name = "btnAgregar";
             btnAgregar.Size = new Size(155, 38);
-            btnAgregar.TabIndex = 11;
+            btnAgregar.TabIndex = 10;
             btnAgregar.Text = "Agregar";
             btnAgregar.UseVisualStyleBackColor = false;
             btnAgregar.Click += btnAgregar_Click;
@@ -294,10 +280,10 @@
             btnModificar.FlatStyle = FlatStyle.Flat;
             btnModificar.ForeColor = Color.White;
             btnModificar.Enabled = false;
-            btnModificar.Location = new Point(185, 285);
+            btnModificar.Location = new Point(185, 283);
             btnModificar.Name = "btnModificar";
             btnModificar.Size = new Size(155, 38);
-            btnModificar.TabIndex = 12;
+            btnModificar.TabIndex = 11;
             btnModificar.Text = "Modificar";
             btnModificar.UseVisualStyleBackColor = false;
             btnModificar.Click += btnModificar_Click;
@@ -307,10 +293,10 @@
             btnEliminar.BackColor = Color.FromArgb(230, 235, 240);
             btnEliminar.FlatStyle = FlatStyle.Flat;
             btnEliminar.Enabled = false;
-            btnEliminar.Location = new Point(20, 333);
+            btnEliminar.Location = new Point(20, 331);
             btnEliminar.Name = "btnEliminar";
             btnEliminar.Size = new Size(155, 38);
-            btnEliminar.TabIndex = 13;
+            btnEliminar.TabIndex = 12;
             btnEliminar.Text = "Eliminar";
             btnEliminar.UseVisualStyleBackColor = false;
             btnEliminar.Click += btnEliminar_Click;
@@ -319,10 +305,10 @@
             // 
             btnLimpiar.BackColor = Color.FromArgb(230, 235, 240);
             btnLimpiar.FlatStyle = FlatStyle.Flat;
-            btnLimpiar.Location = new Point(185, 333);
+            btnLimpiar.Location = new Point(185, 331);
             btnLimpiar.Name = "btnLimpiar";
             btnLimpiar.Size = new Size(155, 38);
-            btnLimpiar.TabIndex = 14;
+            btnLimpiar.TabIndex = 13;
             btnLimpiar.Text = "Limpiar";
             btnLimpiar.UseVisualStyleBackColor = false;
             btnLimpiar.Click += btnLimpiar_Click;
@@ -331,10 +317,10 @@
             // 
             btnImprimirEtiqueta.BackColor = Color.FromArgb(230, 235, 240);
             btnImprimirEtiqueta.FlatStyle = FlatStyle.Flat;
-            btnImprimirEtiqueta.Location = new Point(20, 381);
+            btnImprimirEtiqueta.Location = new Point(20, 379);
             btnImprimirEtiqueta.Name = "btnImprimirEtiqueta";
             btnImprimirEtiqueta.Size = new Size(155, 38);
-            btnImprimirEtiqueta.TabIndex = 15;
+            btnImprimirEtiqueta.TabIndex = 14;
             btnImprimirEtiqueta.Text = "Imprimir etiqueta";
             btnImprimirEtiqueta.UseVisualStyleBackColor = false;
             btnImprimirEtiqueta.Click += btnImprimirEtiqueta_Click;
@@ -359,7 +345,7 @@
             panelBusqueda.Location = new Point(10, 20);
             panelBusqueda.Name = "panelBusqueda";
             panelBusqueda.Size = new Size(692, 80);
-            panelBusqueda.TabIndex = 16;
+            panelBusqueda.TabIndex = 15;
             // 
             // lblBuscar
             // 
@@ -368,7 +354,7 @@
             lblBuscar.Location = new Point(0, 0);
             lblBuscar.Name = "lblBuscar";
             lblBuscar.Size = new Size(277, 20);
-            lblBuscar.TabIndex = 17;
+            lblBuscar.TabIndex = 16;
             lblBuscar.Text = "Buscar por nombre o código de barras";
             // 
             // txtBuscar
@@ -377,7 +363,7 @@
             txtBuscar.MaxLength = 50;
             txtBuscar.Name = "txtBuscar";
             txtBuscar.Size = new Size(330, 27);
-            txtBuscar.TabIndex = 18;
+            txtBuscar.TabIndex = 17;
             txtBuscar.KeyDown += txtBuscar_KeyDown;
             // 
             // btnBuscar
@@ -387,7 +373,7 @@
             btnBuscar.Location = new Point(340, 17);
             btnBuscar.Name = "btnBuscar";
             btnBuscar.Size = new Size(130, 38);
-            btnBuscar.TabIndex = 19;
+            btnBuscar.TabIndex = 18;
             btnBuscar.Text = "Buscar";
             btnBuscar.UseVisualStyleBackColor = false;
             btnBuscar.Click += btnBuscar_Click;
@@ -435,7 +421,7 @@
             dgvProductos.RowTemplate.Height = 32;
             dgvProductos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvProductos.Size = new Size(692, 393);
-            dgvProductos.TabIndex = 20;
+            dgvProductos.TabIndex = 19;
             dgvProductos.CellClick += dgvProductos_CellClick;
             dgvProductos.DataBindingComplete += dgvProductos_DataBindingComplete;
             // 
@@ -540,7 +526,6 @@
         private ComboBox cboCategoria;
         private Label lblCodigoBarras;
         private TextBox txtCodigoBarras;
-        private Button btnGenerarCodigo;
         private Button btnAgregar;
         private Button btnModificar;
         private Button btnEliminar;

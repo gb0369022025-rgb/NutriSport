@@ -63,5 +63,30 @@ namespace NutriSport.DAL
                 }
             }
         }
+
+        public static int Registrar(Venta entidad, List<Detalle_Venta> detalle)
+        {
+            var productos = new List<string>();
+            foreach (Detalle_Venta linea in detalle)
+            {
+                productos.Add("{\"ProductoId\":" + linea.ProductoId + ",\"Cantidad\":" + linea.Cantidad + "}");
+            }
+
+            using (var conn = BDComun.ObtenerConexion())
+            {
+                using (var cmd = BDComun.ObtenerComando("SpRegistrarVenta", conn))
+                {
+                    cmd.Parameters.AddWithValue("@FechaVenta", entidad.FechaVenta);
+                    cmd.Parameters.AddWithValue("@Estado", entidad.Estado);
+                    cmd.Parameters.AddWithValue("@Descripcion", entidad.Descripcion);
+                    cmd.Parameters.AddWithValue("@ClienteId", (object?)entidad.ClienteId ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Detalle", "[" + string.Join(",", productos) + "]");
+                    var idGenerado = new SqlParameter("@IdVentaGenerado", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                    cmd.Parameters.Add(idGenerado);
+                    cmd.ExecuteNonQuery();
+                    return Convert.ToInt32(idGenerado.Value);
+                }
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using NutriSport.BL;
+﻿using Entities;
+using NutriSport.BL;
 using NutriSport.Entities;
 
 namespace View
@@ -9,6 +10,7 @@ namespace View
         private int ventaIdSeleccionado = 0;
         private string ventaSeleccionado = string.Empty;
         private List<Cliente> clientes = new List<Cliente>();
+        private readonly SemaphoreSlim escaneo = new SemaphoreSlim(1, 1);
 
         public FrmVentas()
         {
@@ -16,7 +18,6 @@ namespace View
             dgvVentas.AutoGenerateColumns = false;
         }
 
-        // Clientes y ventas se consultan al mismo tiempo, en segundo plano
         private async void FrmVentas_Load(object sender, EventArgs e)
         {
             MostrarOcupado(true, "Cargando ventas...");
@@ -93,8 +94,6 @@ namespace View
             return cliente == null ? $"Cliente {clienteId.Value}" : $"{cliente.Nombre} {cliente.Apellido}".Trim();
         }
 
-        // Ejecuta la consulta en segundo plano. Si falla, el error se entrega al formulario como resultado
-        // en lugar de lanzarse dentro del hilo; así Visual Studio no pausa el programa y se muestra el mensaje.
         private static Task<T> EnSegundoPlano<T>(Func<T> consulta)
         {
             return Task.Run(() =>
@@ -113,8 +112,98 @@ namespace View
         private void MostrarOcupado(bool ocupado, string? mensaje = null)
         {
             panelDatos.Enabled = !ocupado;
+            panelDetalle.Enabled = !ocupado;
             UseWaitCursor = ocupado;
             if (mensaje != null) lblEstado.Text = mensaje;
+        }
+
+        private async void txtCodigoBarras_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode != Keys.Enter) return;
+            e.SuppressKeyPress = true;
+
+            string codigo = txtCodigoBarras.Text.Trim();
+            int cantidad = (int)nudCantidad.Value;
+            txtCodigoBarras.Clear();
+            nudCantidad.Value = nudCantidad.Minimum;
+            if (codigo.Length == 0) return;
+
+            await escaneo.WaitAsync();
+            try
+            {
+                Producto? producto = await EnSegundoPlano(() => Producto_BL.BuscarPorCodigoBarras(codigo));
+                if (IsDisposed) return;
+                if (producto == null)
+                {
+                    MessageBox.Show($"Ningún producto tiene el código de barras {codigo}.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+                AgregarALaVenta(producto, cantidad);
+            }
+            catch (Exception ex)
+            {
+                if (IsDisposed) return;
+                MessageBox.Show("No se pudo buscar el código de barras.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                escaneo.Release();
+                if (!IsDisposed) txtCodigoBarras.Focus();
+            }
+        }
+
+        private void AgregarALaVenta(Producto producto, int cantidad)
+        {
+            DataGridViewRow? fila = dgvDetalle.Rows.Cast<DataGridViewRow>()
+                .FirstOrDefault(r => r.Tag is Producto p && p.ProductoId == producto.ProductoId);
+            int cantidadTotal = cantidad + (fila == null ? 0 : Convert.ToInt32(fila.Cells[colDetCantidad.Index].Value));
+
+            if (cantidadTotal > producto.Existencia || cantidadTotal > short.MaxValue)
+            {
+                MessageBox.Show($"Solo hay {producto.Existencia} unidades de {producto.NombreProducto} en existencia.",
+                    Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (fila == null)
+            {
+                int indice = dgvDetalle.Rows.Add(producto.NombreProducto, cantidadTotal, producto.Precio, cantidadTotal * producto.Precio);
+                fila = dgvDetalle.Rows[indice];
+            }
+            else
+            {
+                fila.Cells[colDetCantidad.Index].Value = cantidadTotal;
+                fila.Cells[colDetPrecio.Index].Value = producto.Precio;
+                fila.Cells[colDetTotal.Index].Value = cantidadTotal * producto.Precio;
+            }
+            fila.Tag = producto;
+            dgvDetalle.ClearSelection();
+            ActualizarTotal();
+            lblEstado.Text = $"{producto.NombreProducto}: {cantidadTotal} en la venta";
+        }
+
+        private decimal TotalVenta()
+        {
+            return dgvDetalle.Rows.Cast<DataGridViewRow>().Sum(r => Convert.ToDecimal(r.Cells[colDetTotal.Index].Value));
+        }
+
+        private void ActualizarTotal()
+        {
+            lblTotal.Text = $"Total: {TotalVenta():$#,##0.00}";
+        }
+
+        private void btnQuitarProducto_Click(object sender, EventArgs e)
+        {
+            if (dgvDetalle.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Selecciona en la lista el producto que quieres quitar.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            dgvDetalle.Rows.Remove(dgvDetalle.SelectedRows[0]);
+            dgvDetalle.ClearSelection();
+            ActualizarTotal();
+            txtCodigoBarras.Focus();
         }
 
         private bool ValidarCampos()
@@ -131,6 +220,12 @@ namespace View
                 txtDescripcion.Focus();
                 return false;
             }
+            if (dgvDetalle.Rows.Count == 0)
+            {
+                MessageBox.Show("Escanea al menos un producto para registrar la venta.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtCodigoBarras.Focus();
+                return false;
+            }
             return true;
         }
 
@@ -142,11 +237,14 @@ namespace View
             VaciarSeleccion(cboCliente);
             cboEstado.SelectedIndex = 0;
             txtDescripcion.Clear();
+            txtCodigoBarras.Clear();
+            nudCantidad.Value = nudCantidad.Minimum;
+            dgvDetalle.Rows.Clear();
+            ActualizarTotal();
             dgvVentas.ClearSelection();
-            dtpFecha.Focus();
+            txtCodigoBarras.Focus();
         }
 
-        // En un ComboBox enlazado a datos, WinForms solo lo deja vacío si se asigna -1 dos veces
         private static void VaciarSeleccion(ComboBox combo)
         {
             combo.SelectedIndex = -1;
@@ -164,26 +262,29 @@ namespace View
                 Estado = cboEstado.Text,
                 Descripcion = txtDescripcion.Text.Trim()
             };
-            MostrarOcupado(true, "Guardando...");
+            var detalle = dgvDetalle.Rows.Cast<DataGridViewRow>()
+                .Select(r => new Detalle_Venta
+                {
+                    ProductoId = ((Producto)r.Tag!).ProductoId,
+                    Cantidad = Convert.ToInt16(r.Cells[colDetCantidad.Index].Value)
+                })
+                .ToList();
+            decimal total = TotalVenta();
+
+            MostrarOcupado(true, "Registrando venta...");
             try
             {
-                int filas = await EnSegundoPlano(() => Venta_BL.Agregar(venta));
+                int idVenta = await EnSegundoPlano(() => Venta_BL.Registrar(venta, detalle));
                 if (IsDisposed) return;
-                if (filas > 0)
-                {
-                    MessageBox.Show("Venta agregada.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    await CargarVentasAsync();
-                    LimpiarCampos();
-                }
-                else
-                {
-                    MessageBox.Show("No se agregó la venta. Intenta de nuevo.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
+                MessageBox.Show($"Venta N° {idVenta} registrada por {total:$#,##0.00}.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                await CargarVentasAsync();
+                LimpiarCampos();
             }
             catch (Exception ex)
             {
                 if (IsDisposed) return;
-                MessageBox.Show("No se pudo agregar la venta.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("No se pudo registrar la venta. Si algún producto ya no tiene existencia suficiente, la venta no se guarda.\n\nDetalle: " + ex.Message,
+                    Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -225,7 +326,6 @@ namespace View
             }
         }
 
-        // Cierra esta ventana y regresa al formulario principal
         private void btnVolver_Click(object sender, EventArgs e)
         {
             Close();
@@ -248,6 +348,11 @@ namespace View
         private void dgvVentas_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
         {
             dgvVentas.ClearSelection();
+        }
+
+        private void dgvDetalle_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
+        {
+            dgvDetalle.ClearSelection();
         }
     }
 }

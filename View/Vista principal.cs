@@ -6,7 +6,6 @@ namespace View
 {
     public partial class NutriSport : Form
     {
-        // Un producto con esta existencia o menos se cuenta como stock crítico
         private const int StockMinimo = 10;
         private bool primeraCarga = true;
 
@@ -20,7 +19,6 @@ namespace View
             await CargarDashboardAsync();
         }
 
-        // Ventas de hoy, pedidos pendientes y stock crítico calculados con los datos reales de la BD
         private async Task CargarDashboardAsync()
         {
             lblEstado.Text = "Actualizando datos...";
@@ -60,15 +58,12 @@ namespace View
             }
         }
 
-        // Muestra la cifra centrada debajo del título de su tarjeta
         private static void MostrarValor(Label valor, Label titulo, string texto)
         {
             valor.Text = texto;
             valor.Left = titulo.Left + (titulo.Width - valor.Width) / 2;
         }
 
-        // Ejecuta la consulta en segundo plano. Si falla, el error se entrega como resultado
-        // en lugar de lanzarse dentro del hilo; así Visual Studio no pausa el programa.
         private static Task<T> EnSegundoPlano<T>(Func<T> consulta)
         {
             return Task.Run(() =>
@@ -84,7 +79,6 @@ namespace View
             });
         }
 
-        // Abre la ventana encima del menú y, al volver, actualiza el dashboard con los datos nuevos
         private async Task AbrirFormularioAsync(Form formulario)
         {
             using (formulario)

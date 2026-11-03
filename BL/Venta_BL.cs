@@ -20,5 +20,10 @@ namespace NutriSport.BL
         {
             return Venta_DAL.Eliminar(id);
         }
+
+        public static int Registrar(Venta entidad, List<Detalle_Venta> detalle)
+        {
+            return Venta_DAL.Registrar(entidad, detalle);
+        }
     }
 }
