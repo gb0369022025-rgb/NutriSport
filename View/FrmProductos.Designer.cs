@@ -46,9 +46,14 @@
             nudExistencia = new NumericUpDown();
             lblCategoria = new Label();
             cboCategoria = new ComboBox();
+            lblCodigoBarras = new Label();
+            txtCodigoBarras = new TextBox();
+            btnGenerarCodigo = new Button();
             btnAgregar = new Button();
             btnModificar = new Button();
+            btnEliminar = new Button();
             btnLimpiar = new Button();
+            btnImprimirEtiqueta = new Button();
             panelContenido = new Panel();
             panelBusqueda = new Panel();
             lblBuscar = new Label();
@@ -57,6 +62,7 @@
             dgvProductos = new DataGridView();
             colCodigo = new DataGridViewTextBoxColumn();
             colProducto = new DataGridViewTextBoxColumn();
+            colCodigoBarras = new DataGridViewTextBoxColumn();
             colPrecio = new DataGridViewTextBoxColumn();
             colExistencia = new DataGridViewTextBoxColumn();
             panelSuperior.SuspendLayout();
@@ -138,9 +144,14 @@
             // 
             // panelDatos
             // 
+            panelDatos.Controls.Add(btnImprimirEtiqueta);
             panelDatos.Controls.Add(btnLimpiar);
+            panelDatos.Controls.Add(btnEliminar);
             panelDatos.Controls.Add(btnModificar);
             panelDatos.Controls.Add(btnAgregar);
+            panelDatos.Controls.Add(btnGenerarCodigo);
+            panelDatos.Controls.Add(lblCodigoBarras);
+            panelDatos.Controls.Add(txtCodigoBarras);
             panelDatos.Controls.Add(lblCategoria);
             panelDatos.Controls.Add(cboCategoria);
             panelDatos.Controls.Add(lblExistencia);
@@ -231,16 +242,47 @@
             cboCategoria.Size = new Size(320, 28);
             cboCategoria.TabIndex = 7;
             // 
+            // lblCodigoBarras
+            // 
+            lblCodigoBarras.AutoSize = true;
+            lblCodigoBarras.ForeColor = Color.FromArgb(30, 30, 30);
+            lblCodigoBarras.Location = new Point(20, 210);
+            lblCodigoBarras.Name = "lblCodigoBarras";
+            lblCodigoBarras.Size = new Size(125, 20);
+            lblCodigoBarras.TabIndex = 8;
+            lblCodigoBarras.Text = "Código de barras";
+            // 
+            // txtCodigoBarras
+            // 
+            txtCodigoBarras.Location = new Point(20, 232);
+            txtCodigoBarras.MaxLength = 30;
+            txtCodigoBarras.Name = "txtCodigoBarras";
+            txtCodigoBarras.Size = new Size(155, 27);
+            txtCodigoBarras.KeyDown += txtCodigoBarras_KeyDown;
+            txtCodigoBarras.TabIndex = 9;
+            // 
+            // btnGenerarCodigo
+            // 
+            btnGenerarCodigo.BackColor = Color.FromArgb(230, 235, 240);
+            btnGenerarCodigo.FlatStyle = FlatStyle.Flat;
+            btnGenerarCodigo.Location = new Point(185, 232);
+            btnGenerarCodigo.Name = "btnGenerarCodigo";
+            btnGenerarCodigo.Size = new Size(155, 29);
+            btnGenerarCodigo.TabIndex = 10;
+            btnGenerarCodigo.Text = "Generar código";
+            btnGenerarCodigo.UseVisualStyleBackColor = false;
+            btnGenerarCodigo.Click += btnGenerarCodigo_Click;
+            // 
             // btnAgregar
             // 
             btnAgregar.BackColor = Color.FromArgb(46, 51, 73);
             btnAgregar.FlatAppearance.BorderSize = 0;
             btnAgregar.FlatStyle = FlatStyle.Flat;
             btnAgregar.ForeColor = Color.White;
-            btnAgregar.Location = new Point(20, 220);
+            btnAgregar.Location = new Point(20, 285);
             btnAgregar.Name = "btnAgregar";
             btnAgregar.Size = new Size(155, 38);
-            btnAgregar.TabIndex = 8;
+            btnAgregar.TabIndex = 11;
             btnAgregar.Text = "Agregar";
             btnAgregar.UseVisualStyleBackColor = false;
             btnAgregar.Click += btnAgregar_Click;
@@ -252,25 +294,50 @@
             btnModificar.FlatStyle = FlatStyle.Flat;
             btnModificar.ForeColor = Color.White;
             btnModificar.Enabled = false;
-            btnModificar.Location = new Point(185, 220);
+            btnModificar.Location = new Point(185, 285);
             btnModificar.Name = "btnModificar";
             btnModificar.Size = new Size(155, 38);
-            btnModificar.TabIndex = 9;
+            btnModificar.TabIndex = 12;
             btnModificar.Text = "Modificar";
             btnModificar.UseVisualStyleBackColor = false;
             btnModificar.Click += btnModificar_Click;
+            // 
+            // btnEliminar
+            // 
+            btnEliminar.BackColor = Color.FromArgb(230, 235, 240);
+            btnEliminar.FlatStyle = FlatStyle.Flat;
+            btnEliminar.Enabled = false;
+            btnEliminar.Location = new Point(20, 333);
+            btnEliminar.Name = "btnEliminar";
+            btnEliminar.Size = new Size(155, 38);
+            btnEliminar.TabIndex = 13;
+            btnEliminar.Text = "Eliminar";
+            btnEliminar.UseVisualStyleBackColor = false;
+            btnEliminar.Click += btnEliminar_Click;
             // 
             // btnLimpiar
             // 
             btnLimpiar.BackColor = Color.FromArgb(230, 235, 240);
             btnLimpiar.FlatStyle = FlatStyle.Flat;
-            btnLimpiar.Location = new Point(20, 268);
+            btnLimpiar.Location = new Point(185, 333);
             btnLimpiar.Name = "btnLimpiar";
             btnLimpiar.Size = new Size(155, 38);
-            btnLimpiar.TabIndex = 10;
+            btnLimpiar.TabIndex = 14;
             btnLimpiar.Text = "Limpiar";
             btnLimpiar.UseVisualStyleBackColor = false;
             btnLimpiar.Click += btnLimpiar_Click;
+            // 
+            // btnImprimirEtiqueta
+            // 
+            btnImprimirEtiqueta.BackColor = Color.FromArgb(230, 235, 240);
+            btnImprimirEtiqueta.FlatStyle = FlatStyle.Flat;
+            btnImprimirEtiqueta.Location = new Point(20, 381);
+            btnImprimirEtiqueta.Name = "btnImprimirEtiqueta";
+            btnImprimirEtiqueta.Size = new Size(155, 38);
+            btnImprimirEtiqueta.TabIndex = 15;
+            btnImprimirEtiqueta.Text = "Imprimir etiqueta";
+            btnImprimirEtiqueta.UseVisualStyleBackColor = false;
+            btnImprimirEtiqueta.Click += btnImprimirEtiqueta_Click;
             // 
             // panelContenido
             // 
@@ -292,7 +359,7 @@
             panelBusqueda.Location = new Point(10, 20);
             panelBusqueda.Name = "panelBusqueda";
             panelBusqueda.Size = new Size(692, 80);
-            panelBusqueda.TabIndex = 11;
+            panelBusqueda.TabIndex = 16;
             // 
             // lblBuscar
             // 
@@ -300,9 +367,9 @@
             lblBuscar.ForeColor = Color.FromArgb(30, 30, 30);
             lblBuscar.Location = new Point(0, 0);
             lblBuscar.Name = "lblBuscar";
-            lblBuscar.Size = new Size(201, 20);
-            lblBuscar.TabIndex = 12;
-            lblBuscar.Text = "Buscar producto por nombre";
+            lblBuscar.Size = new Size(277, 20);
+            lblBuscar.TabIndex = 17;
+            lblBuscar.Text = "Buscar por nombre o código de barras";
             // 
             // txtBuscar
             // 
@@ -310,7 +377,7 @@
             txtBuscar.MaxLength = 50;
             txtBuscar.Name = "txtBuscar";
             txtBuscar.Size = new Size(330, 27);
-            txtBuscar.TabIndex = 13;
+            txtBuscar.TabIndex = 18;
             txtBuscar.KeyDown += txtBuscar_KeyDown;
             // 
             // btnBuscar
@@ -320,7 +387,7 @@
             btnBuscar.Location = new Point(340, 17);
             btnBuscar.Name = "btnBuscar";
             btnBuscar.Size = new Size(130, 38);
-            btnBuscar.TabIndex = 14;
+            btnBuscar.TabIndex = 19;
             btnBuscar.Text = "Buscar";
             btnBuscar.UseVisualStyleBackColor = false;
             btnBuscar.Click += btnBuscar_Click;
@@ -346,7 +413,7 @@
             dgvProductos.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dgvProductos.ColumnHeadersHeight = 40;
             dgvProductos.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            dgvProductos.Columns.AddRange(new DataGridViewColumn[] { colCodigo, colProducto, colPrecio, colExistencia });
+            dgvProductos.Columns.AddRange(new DataGridViewColumn[] { colCodigo, colProducto, colCodigoBarras, colPrecio, colExistencia });
             dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle2.BackColor = Color.White;
             dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
@@ -368,7 +435,7 @@
             dgvProductos.RowTemplate.Height = 32;
             dgvProductos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvProductos.Size = new Size(692, 393);
-            dgvProductos.TabIndex = 15;
+            dgvProductos.TabIndex = 20;
             dgvProductos.CellClick += dgvProductos_CellClick;
             dgvProductos.DataBindingComplete += dgvProductos_DataBindingComplete;
             // 
@@ -390,6 +457,16 @@
             colProducto.MinimumWidth = 90;
             colProducto.Name = "colProducto";
             colProducto.ReadOnly = true;
+            // 
+            // colCodigoBarras
+            // 
+            colCodigoBarras.DataPropertyName = "CodigoBarras";
+            colCodigoBarras.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+            colCodigoBarras.FillWeight = 90F;
+            colCodigoBarras.HeaderText = "Código de barras";
+            colCodigoBarras.MinimumWidth = 6;
+            colCodigoBarras.Name = "colCodigoBarras";
+            colCodigoBarras.ReadOnly = true;
             // 
             // colPrecio
             // 
@@ -461,9 +538,14 @@
         private NumericUpDown nudExistencia;
         private Label lblCategoria;
         private ComboBox cboCategoria;
+        private Label lblCodigoBarras;
+        private TextBox txtCodigoBarras;
+        private Button btnGenerarCodigo;
         private Button btnAgregar;
         private Button btnModificar;
+        private Button btnEliminar;
         private Button btnLimpiar;
+        private Button btnImprimirEtiqueta;
         private Panel panelContenido;
         private Panel panelBusqueda;
         private Label lblBuscar;
@@ -472,6 +554,7 @@
         private DataGridView dgvProductos;
         private DataGridViewTextBoxColumn colCodigo;
         private DataGridViewTextBoxColumn colProducto;
+        private DataGridViewTextBoxColumn colCodigoBarras;
         private DataGridViewTextBoxColumn colPrecio;
         private DataGridViewTextBoxColumn colExistencia;
     }

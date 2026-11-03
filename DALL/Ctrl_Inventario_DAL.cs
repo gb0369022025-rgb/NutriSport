@@ -53,5 +53,17 @@ namespace NutriSport.DAL
                 }
             }
         }
+
+        public static int Eliminar(int id)
+        {
+            using (var conn = BDComun.ObtenerConexion())
+            {
+                using (var cmd = BDComun.ObtenerComando("SpDeleteControlInventario", conn))
+                {
+                    cmd.Parameters.AddWithValue("@ControlInvId", id);
+                    return cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

@@ -49,5 +49,17 @@ namespace NutriSport.DAL
                 }
             }
         }
+
+        public static int Eliminar(int id)
+        {
+            using (var conn = BDComun.ObtenerConexion())
+            {
+                using (var cmd = BDComun.ObtenerComando("SpDeleteUsuario", conn))
+                {
+                    cmd.Parameters.AddWithValue("@UsuarioId", id);
+                    return cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
 }

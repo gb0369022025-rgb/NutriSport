@@ -7,6 +7,8 @@ namespace View
     public partial class FrmUsuarios : Form
     {
         private const string Titulo = "Usuarios";
+        private int usuarioIdSeleccionado = 0;
+        private string usuarioSeleccionado = string.Empty;
 
         public FrmUsuarios()
         {
@@ -129,6 +131,8 @@ namespace View
 
         private void LimpiarCampos()
         {
+            usuarioIdSeleccionado = 0;
+            btnEliminar.Enabled = false;
             txtNombreUsuario.Clear();
             cboEmpleado.SelectedIndex = -1;
             cboEmpleado.Text = string.Empty;
@@ -178,6 +182,40 @@ namespace View
             }
         }
 
+        private async void btnEliminar_Click(object sender, EventArgs e)
+        {
+            if (usuarioIdSeleccionado == 0)
+            {
+                MessageBox.Show("Selecciona en la lista el usuario que quieres eliminar.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DialogResult respuesta = MessageBox.Show($"¿Eliminar {usuarioSeleccionado}?",
+                Titulo, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (respuesta != DialogResult.Yes) return;
+
+            int id = usuarioIdSeleccionado;
+            MostrarOcupado(true, "Eliminando...");
+            try
+            {
+                int filas = await EnSegundoPlano(() => Usuario_BL.Eliminar(id));
+                if (IsDisposed) return;
+                MessageBox.Show(filas > 0 ? "Usuario eliminado." : "El usuario ya no existe. Se actualizará la lista.",
+                    Titulo, MessageBoxButtons.OK, filas > 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+                await CargarUsuariosAsync();
+                LimpiarCampos();
+            }
+            catch (Exception ex)
+            {
+                if (IsDisposed) return;
+                MessageBox.Show("No se pudo eliminar el usuario.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+        }
+
         // Cierra esta ventana y regresa al formulario principal
         private void btnVolver_Click(object sender, EventArgs e)
         {
@@ -187,6 +225,15 @@ namespace View
         private void btnLimpiar_Click(object sender, EventArgs e)
         {
             LimpiarCampos();
+        }
+
+        private void dgvUsuarios_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            DataGridViewRow fila = dgvUsuarios.Rows[e.RowIndex];
+            usuarioIdSeleccionado = Convert.ToInt32(fila.Cells[colCodigo.Index].Value);
+            usuarioSeleccionado = $"al usuario \"{fila.Cells[colNombre.Index].Value}\"";
+            btnEliminar.Enabled = true;
         }
 
         private void dgvUsuarios_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)

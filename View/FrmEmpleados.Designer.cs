@@ -55,6 +55,7 @@
             nudCargoId = new NumericUpDown();
             btnAgregar = new Button();
             btnLimpiar = new Button();
+            btnEliminar = new Button();
             panelContenido = new Panel();
             dgvEmpleados = new DataGridView();
             colCodigo = new DataGridViewTextBoxColumn();
@@ -144,6 +145,7 @@
             // 
             // panelDatos
             // 
+            panelDatos.Controls.Add(btnEliminar);
             panelDatos.Controls.Add(btnLimpiar);
             panelDatos.Controls.Add(btnAgregar);
             panelDatos.Controls.Add(lblCargoId);
@@ -342,6 +344,19 @@
             btnLimpiar.UseVisualStyleBackColor = false;
             btnLimpiar.Click += btnLimpiar_Click;
             // 
+            // btnEliminar
+            // 
+            btnEliminar.BackColor = Color.FromArgb(230, 235, 240);
+            btnEliminar.FlatStyle = FlatStyle.Flat;
+            btnEliminar.Enabled = false;
+            btnEliminar.Location = new Point(20, 456);
+            btnEliminar.Name = "btnEliminar";
+            btnEliminar.Size = new Size(155, 38);
+            btnEliminar.TabIndex = 18;
+            btnEliminar.Text = "Eliminar";
+            btnEliminar.UseVisualStyleBackColor = false;
+            btnEliminar.Click += btnEliminar_Click;
+            // 
             // panelContenido
             // 
             panelContenido.Controls.Add(dgvEmpleados);
@@ -395,7 +410,8 @@
             dgvEmpleados.RowTemplate.Height = 32;
             dgvEmpleados.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvEmpleados.Size = new Size(692, 473);
-            dgvEmpleados.TabIndex = 18;
+            dgvEmpleados.TabIndex = 19;
+            dgvEmpleados.CellClick += dgvEmpleados_CellClick;
             dgvEmpleados.DataBindingComplete += dgvEmpleados_DataBindingComplete;
             // 
             // colCodigo
@@ -538,6 +554,7 @@
         private NumericUpDown nudCargoId;
         private Button btnAgregar;
         private Button btnLimpiar;
+        private Button btnEliminar;
         private Panel panelContenido;
         private DataGridView dgvEmpleados;
         private DataGridViewTextBoxColumn colCodigo;

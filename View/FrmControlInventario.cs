@@ -6,6 +6,8 @@ namespace View
     public partial class FrmControlInventario : Form
     {
         private const string Titulo = "Control de inventario";
+        private int controlIdSeleccionado = 0;
+        private string controlSeleccionado = string.Empty;
         private List<Usuario> usuarios = new List<Usuario>();
 
         public FrmControlInventario()
@@ -120,6 +122,8 @@ namespace View
 
         private void LimpiarCampos()
         {
+            controlIdSeleccionado = 0;
+            btnEliminar.Enabled = false;
             VaciarSeleccion(cboUsuario);
             dtpFechaHora.Value = DateTime.Now;
             nudCantProducto.Value = 0;
@@ -175,6 +179,40 @@ namespace View
             }
         }
 
+        private async void btnEliminar_Click(object sender, EventArgs e)
+        {
+            if (controlIdSeleccionado == 0)
+            {
+                MessageBox.Show("Selecciona en la lista el control de inventario que quieres eliminar.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DialogResult respuesta = MessageBox.Show($"¿Eliminar {controlSeleccionado}? También se eliminará su detalle.",
+                Titulo, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (respuesta != DialogResult.Yes) return;
+
+            int id = controlIdSeleccionado;
+            MostrarOcupado(true, "Eliminando...");
+            try
+            {
+                int filas = await EnSegundoPlano(() => Ctrl_Inventario_BL.Eliminar(id));
+                if (IsDisposed) return;
+                MessageBox.Show(filas > 0 ? "Control de inventario eliminado." : "El control de inventario ya no existe. Se actualizará la lista.",
+                    Titulo, MessageBoxButtons.OK, filas > 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+                await CargarControlesAsync();
+                LimpiarCampos();
+            }
+            catch (Exception ex)
+            {
+                if (IsDisposed) return;
+                MessageBox.Show("No se pudo eliminar el control de inventario.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+        }
+
         // Cierra esta ventana y regresa al formulario principal
         private void btnVolver_Click(object sender, EventArgs e)
         {
@@ -184,6 +222,15 @@ namespace View
         private void btnLimpiar_Click(object sender, EventArgs e)
         {
             LimpiarCampos();
+        }
+
+        private void dgvControlInventario_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            DataGridViewRow fila = dgvControlInventario.Rows[e.RowIndex];
+            controlIdSeleccionado = Convert.ToInt32(fila.Cells[colCodigo.Index].Value);
+            controlSeleccionado = $"el control de inventario N° {controlIdSeleccionado}";
+            btnEliminar.Enabled = true;
         }
 
         private void dgvControlInventario_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)

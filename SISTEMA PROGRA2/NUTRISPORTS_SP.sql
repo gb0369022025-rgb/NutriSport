@@ -64,13 +64,14 @@ go
 create procedure SpSelectAllProducto
 as
 begin
-	select a.ProductoId as 'Cod.', 
-	       a.Producto as 'Producto', 
+	select a.ProductoId as 'Cod.',
+	       a.Producto as 'Producto',
 	       a.Precio as 'P. Unitario',
 	       a.Existencia as 'Existencia',
-	       (cast(a.CategoriaId as varchar) + ' - ' + b.Categoria) as 'Categoria'
+	       (cast(a.CategoriaId as varchar) + ' - ' + b.Categoria) as 'Categoria',
+	       a.CodigoBarras as 'Codigo Barras'
 	from PRODUCTO a
-	inner join CATEGORIA b on a.CategoriaId = b.CategoriaId 
+	inner join CATEGORIA b on a.CategoriaId = b.CategoriaId
 	where a.Estado = 1
 	order by a.Producto asc;
 end;
@@ -80,50 +81,76 @@ create procedure SpSelectNombreProducto
 	@Producto varchar(50)
 as
 begin
-	select ProductoId as 'Codigo', Producto, Precio, Existencia
-	from PRODUCTO 
+	select ProductoId as 'Codigo', Producto, Precio, Existencia,
+	       CodigoBarras as 'Codigo Barras'
+	from PRODUCTO
 	where Producto like '%' + @Producto + '%' and Estado = 1;
 end;
 
 go
-create procedure SpInsertProducto
-	@Producto varchar(50), 
-	@Precio money,
-	@Existencia int, 
-	@CategoriaId int
+create procedure SpSelectProductoCodigoBarras
+	@CodigoBarras varchar(30)
 as
 begin
+	select a.ProductoId as 'Cod.',
+	       a.Producto as 'Producto',
+	       a.Precio as 'P. Unitario',
+	       a.Existencia as 'Existencia',
+	       (cast(a.CategoriaId as varchar) + ' - ' + b.Categoria) as 'Categoria',
+	       a.CodigoBarras as 'Codigo Barras'
+	from PRODUCTO a
+	inner join CATEGORIA b on a.CategoriaId = b.CategoriaId
+	where a.CodigoBarras = @CodigoBarras and a.Estado = 1;
+end;
+
+go
+create procedure SpInsertProducto
+	@Producto varchar(50),
+	@Precio money,
+	@Existencia int,
+	@CategoriaId int,
+	@CodigoBarras varchar(30) = null
+as
+begin
+	set @CodigoBarras = nullif(ltrim(rtrim(@CodigoBarras)), '');
+
 	if exists(select * from PRODUCTO where Producto = @Producto)
+	   or exists(select * from PRODUCTO where CodigoBarras = @CodigoBarras)
 		begin
-			print 'El producto que intenta registrar ya existe en la BD.'
+			print 'El producto o el código de barras ya existe en la BD.'
 		end
 	else
 		begin
-			insert into PRODUCTO (Producto, Precio, Existencia, CategoriaId)
-			values (@Producto, @Precio, @Existencia, @CategoriaId);
+			insert into PRODUCTO (Producto, Precio, Existencia, CategoriaId, CodigoBarras)
+			values (@Producto, @Precio, @Existencia, @CategoriaId, @CodigoBarras);
 		end
 end;
 
 go
 create procedure SpUpdateProducto
 	@ProductoId smallint,
-	@Producto varchar(50), 
+	@Producto varchar(50),
 	@Precio money,
-	@Existencia int, 
-	@CategoriaId int
+	@Existencia int,
+	@CategoriaId int,
+	@CodigoBarras varchar(30) = null
 as
 begin
+	set @CodigoBarras = nullif(ltrim(rtrim(@CodigoBarras)), '');
+
 	if exists (select * from PRODUCTO where Producto = @Producto and ProductoId <> @ProductoId)
+	   or exists (select * from PRODUCTO where CodigoBarras = @CodigoBarras and ProductoId <> @ProductoId)
 		begin
-			print 'El producto que intenta modificar ya existe.'
+			print 'El producto o el código de barras ya existe.'
 		end
 	else
 		begin
-			update PRODUCTO 
+			update PRODUCTO
 			set Producto = @Producto,
 			    Precio = @Precio,
 			    Existencia = @Existencia,
-			    CategoriaId = @CategoriaId
+			    CategoriaId = @CategoriaId,
+			    CodigoBarras = @CodigoBarras
 			where ProductoId = @ProductoId;
 		end
 end;
@@ -592,6 +619,14 @@ begin
 	order by Nombre asc;
 end;
 
+go
+create procedure SpDeletePedido
+	@PedidoId int
+as
+begin
+	delete from PEDIDO where PedidoId = @PedidoId;
+end;
+
 
 
 go
@@ -657,6 +692,29 @@ begin
 	order by DetalleVentaId asc;
 end;
 
+go
+create procedure SpDeleteVenta
+	@IdVenta int
+as
+begin
+	set xact_abort on;
+	begin transaction;
+
+	-- Devuelve a la existencia los productos de la venta
+	update p
+	set p.Existencia = p.Existencia + d.Cantidad
+	from PRODUCTO p
+	inner join (select ProductoId, sum(Cantidad) as Cantidad
+	            from DETALLE_VENTA
+	            where IdVenta = @IdVenta
+	            group by ProductoId) d on d.ProductoId = p.ProductoId;
+
+	delete from DETALLE_VENTA where IdVenta = @IdVenta;
+	delete from VENTA where IdVenta = @IdVenta;
+
+	commit transaction;
+end;
+
 
 go
 create procedure SpSelectAllCompra
@@ -715,6 +773,29 @@ begin
 		end
 end;
 
+go
+create procedure SpDeleteCompra
+	@CompraId int
+as
+begin
+	set xact_abort on;
+	begin transaction;
+
+	-- Quita de la existencia los productos que entraron con la compra
+	update p
+	set p.Existencia = p.Existencia - d.Cantidad
+	from PRODUCTO p
+	inner join (select NombreProducto, sum(Cantidad) as Cantidad
+	            from DETALLE_COMPRA
+	            where NombreCompra = @CompraId and NombreProducto is not null
+	            group by NombreProducto) d on d.NombreProducto = p.ProductoId;
+
+	delete from DETALLE_COMPRA where NombreCompra = @CompraId;
+	delete from COMPRA where CompraId = @CompraId;
+
+	commit transaction;
+end;
+
 
 go
 create procedure SpSelectAllControlInventario
@@ -745,6 +826,20 @@ begin
 	values (@NombreUsuario, @FechaHora, @CantProducto, @Observacion, @Estado);
 
 	set @ControlInvIdGenerado = scope_identity();
+end;
+
+go
+create procedure SpDeleteControlInventario
+	@ControlInvId int
+as
+begin
+	set xact_abort on;
+	begin transaction;
+
+	delete from DET_CONTROL_INV where NombreControlInv = @ControlInvId;
+	delete from CONTROL_INVENTARIO where ControlInvId = @ControlInvId;
+
+	commit transaction;
 end;
 
 go

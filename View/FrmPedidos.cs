@@ -6,6 +6,8 @@ namespace View
     public partial class FrmPedidos : Form
     {
         private const string Titulo = "Pedidos";
+        private int pedidoIdSeleccionado = 0;
+        private string pedidoSeleccionado = string.Empty;
 
         public FrmPedidos()
         {
@@ -71,6 +73,8 @@ namespace View
 
         private void LimpiarCampos()
         {
+            pedidoIdSeleccionado = 0;
+            btnEliminar.Enabled = false;
             nudNumeroPedido.Value = nudNumeroPedido.Minimum;
             cboEstado.SelectedIndex = 0;
             dgvPedidos.ClearSelection();
@@ -112,6 +116,40 @@ namespace View
             }
         }
 
+        private async void btnEliminar_Click(object sender, EventArgs e)
+        {
+            if (pedidoIdSeleccionado == 0)
+            {
+                MessageBox.Show("Selecciona en la lista el pedido que quieres eliminar.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DialogResult respuesta = MessageBox.Show($"¿Eliminar {pedidoSeleccionado}?",
+                Titulo, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (respuesta != DialogResult.Yes) return;
+
+            int id = pedidoIdSeleccionado;
+            MostrarOcupado(true, "Eliminando...");
+            try
+            {
+                int filas = await EnSegundoPlano(() => Pedido_BL.Eliminar(id));
+                if (IsDisposed) return;
+                MessageBox.Show(filas > 0 ? "Pedido eliminado." : "El pedido ya no existe. Se actualizará la lista.",
+                    Titulo, MessageBoxButtons.OK, filas > 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+                await CargarPedidosAsync();
+                LimpiarCampos();
+            }
+            catch (Exception ex)
+            {
+                if (IsDisposed) return;
+                MessageBox.Show("No se pudo eliminar el pedido.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+        }
+
         // Cierra esta ventana y regresa al formulario principal
         private void btnVolver_Click(object sender, EventArgs e)
         {
@@ -121,6 +159,15 @@ namespace View
         private void btnLimpiar_Click(object sender, EventArgs e)
         {
             LimpiarCampos();
+        }
+
+        private void dgvPedidos_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            DataGridViewRow fila = dgvPedidos.Rows[e.RowIndex];
+            pedidoIdSeleccionado = Convert.ToInt32(fila.Cells[colCodigo.Index].Value);
+            pedidoSeleccionado = $"el pedido N° {fila.Cells[colNumeroPedido.Index].Value ?? pedidoIdSeleccionado}";
+            btnEliminar.Enabled = true;
         }
 
         private void dgvPedidos_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)

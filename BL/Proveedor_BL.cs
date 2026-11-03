@@ -15,5 +15,10 @@ namespace NutriSport.BL
         {
             return Proveedor_DAL.Agregar(entidad);
         }
+
+        public static int Eliminar(int id)
+        {
+            return Proveedor_DAL.Eliminar(id);
+        }
     }
 }

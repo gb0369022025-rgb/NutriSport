@@ -35,8 +35,14 @@ create table PRODUCTO(
 	Precio money check(Precio>0.00) not null,
 	Existencia int not null check(Existencia>=0),
 	CategoriaId int foreign key references CATEGORIA (CategoriaId),
-	Estado int not null default 1
+	Estado int not null default 1,
+	CodigoBarras varchar(30) null
 );
+
+-- Un producto por código de barras; los productos sin código no cuentan
+create unique nonclustered index UX_PRODUCTO_CodigoBarras
+	on PRODUCTO (CodigoBarras)
+	where CodigoBarras is not null;
 
 create table CLIENTE(
 	ClienteId int primary key identity,

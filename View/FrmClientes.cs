@@ -6,6 +6,7 @@ namespace View
     public partial class FrmClientes : Form
     {
         private const string Titulo = "Clientes";
+        private string clienteSeleccionado = string.Empty;
         private int clienteIdSeleccionado = 0;
 
         public FrmClientes()
@@ -106,6 +107,7 @@ namespace View
             txtDUI.Clear();
             txtEmail.Clear();
             btnModificar.Enabled = false;
+            btnEliminar.Enabled = false;
             dgvClientes.ClearSelection();
             txtNombre.Focus();
         }
@@ -179,6 +181,40 @@ namespace View
             }
         }
 
+        private async void btnEliminar_Click(object sender, EventArgs e)
+        {
+            if (clienteIdSeleccionado == 0)
+            {
+                MessageBox.Show("Selecciona en la lista el cliente que quieres eliminar.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DialogResult respuesta = MessageBox.Show($"¿Eliminar {clienteSeleccionado}?",
+                Titulo, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (respuesta != DialogResult.Yes) return;
+
+            int id = clienteIdSeleccionado;
+            MostrarOcupado(true, "Eliminando...");
+            try
+            {
+                int filas = await EnSegundoPlano(() => Cliente_BL.Eliminar(id));
+                if (IsDisposed) return;
+                MessageBox.Show(filas > 0 ? "Cliente eliminado." : "El cliente ya no existe. Se actualizará la lista.",
+                    Titulo, MessageBoxButtons.OK, filas > 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+                await CargarClientesAsync();
+                LimpiarCampos();
+            }
+            catch (Exception ex)
+            {
+                if (IsDisposed) return;
+                MessageBox.Show("No se pudo eliminar el cliente.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+        }
+
         // Cierra esta ventana y regresa al formulario principal
         private void btnVolver_Click(object sender, EventArgs e)
         {
@@ -202,6 +238,8 @@ namespace View
             txtDUI.Text = cliente.DUI;
             txtEmail.Text = cliente.Email;
             btnModificar.Enabled = true;
+            clienteSeleccionado = $"al cliente \"{(cliente.Nombre + " " + cliente.Apellido).Trim()}\"";
+            btnEliminar.Enabled = true;
         }
 
         private void dgvClientes_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)

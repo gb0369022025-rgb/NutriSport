@@ -6,6 +6,8 @@ namespace View
     public partial class FrmProveedores : Form
     {
         private const string Titulo = "Proveedores";
+        private int proveedorIdSeleccionado = 0;
+        private string proveedorSeleccionado = string.Empty;
 
         public FrmProveedores()
         {
@@ -86,6 +88,8 @@ namespace View
 
         private void LimpiarCampos()
         {
+            proveedorIdSeleccionado = 0;
+            btnEliminar.Enabled = false;
             txtNombre.Clear();
             txtDireccion.Clear();
             txtTelefono.Clear();
@@ -130,6 +134,40 @@ namespace View
             }
         }
 
+        private async void btnEliminar_Click(object sender, EventArgs e)
+        {
+            if (proveedorIdSeleccionado == 0)
+            {
+                MessageBox.Show("Selecciona en la lista el proveedor que quieres eliminar.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DialogResult respuesta = MessageBox.Show($"¿Eliminar {proveedorSeleccionado}?",
+                Titulo, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (respuesta != DialogResult.Yes) return;
+
+            int id = proveedorIdSeleccionado;
+            MostrarOcupado(true, "Eliminando...");
+            try
+            {
+                int filas = await EnSegundoPlano(() => Proveedor_BL.Eliminar(id));
+                if (IsDisposed) return;
+                MessageBox.Show(filas > 0 ? "Proveedor eliminado." : "El proveedor ya no existe. Se actualizará la lista.",
+                    Titulo, MessageBoxButtons.OK, filas > 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+                await CargarProveedoresAsync();
+                LimpiarCampos();
+            }
+            catch (Exception ex)
+            {
+                if (IsDisposed) return;
+                MessageBox.Show("No se pudo eliminar el proveedor.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+        }
+
         // Cierra esta ventana y regresa al formulario principal
         private void btnVolver_Click(object sender, EventArgs e)
         {
@@ -139,6 +177,15 @@ namespace View
         private void btnLimpiar_Click(object sender, EventArgs e)
         {
             LimpiarCampos();
+        }
+
+        private void dgvProveedores_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            DataGridViewRow fila = dgvProveedores.Rows[e.RowIndex];
+            proveedorIdSeleccionado = Convert.ToInt32(fila.Cells[colCodigo.Index].Value);
+            proveedorSeleccionado = $"al proveedor \"{fila.Cells[colNombre.Index].Value}\"";
+            btnEliminar.Enabled = true;
         }
 
         private void dgvProveedores_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)

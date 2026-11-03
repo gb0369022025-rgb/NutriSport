@@ -6,6 +6,8 @@ namespace View
     public partial class FrmCompras : Form
     {
         private const string Titulo = "Compras";
+        private int compraIdSeleccionado = 0;
+        private string compraSeleccionado = string.Empty;
         private List<Proveedor> proveedores = new List<Proveedor>();
         private List<Usuario> usuarios = new List<Usuario>();
 
@@ -148,6 +150,8 @@ namespace View
 
         private void LimpiarCampos()
         {
+            compraIdSeleccionado = 0;
+            btnEliminar.Enabled = false;
             dtpFechaHora.Value = DateTime.Now;
             VaciarSeleccion(cboProveedor);
             nudNumFact.Value = nudNumFact.Minimum;
@@ -207,6 +211,40 @@ namespace View
             }
         }
 
+        private async void btnEliminar_Click(object sender, EventArgs e)
+        {
+            if (compraIdSeleccionado == 0)
+            {
+                MessageBox.Show("Selecciona en la lista la compra que quieres eliminar.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DialogResult respuesta = MessageBox.Show($"¿Eliminar {compraSeleccionado}? Sus productos se descontarán de la existencia.",
+                Titulo, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (respuesta != DialogResult.Yes) return;
+
+            int id = compraIdSeleccionado;
+            MostrarOcupado(true, "Eliminando...");
+            try
+            {
+                int filas = await EnSegundoPlano(() => Compra_BL.Eliminar(id));
+                if (IsDisposed) return;
+                MessageBox.Show(filas > 0 ? "Compra eliminada." : "La compra ya no existe. Se actualizará la lista.",
+                    Titulo, MessageBoxButtons.OK, filas > 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+                await CargarComprasAsync();
+                LimpiarCampos();
+            }
+            catch (Exception ex)
+            {
+                if (IsDisposed) return;
+                MessageBox.Show("No se pudo eliminar la compra. Si sus productos ya se vendieron, la existencia quedaría en negativo y la base de datos no lo permite.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+        }
+
         // Cierra esta ventana y regresa al formulario principal
         private void btnVolver_Click(object sender, EventArgs e)
         {
@@ -216,6 +254,15 @@ namespace View
         private void btnLimpiar_Click(object sender, EventArgs e)
         {
             LimpiarCampos();
+        }
+
+        private void dgvCompras_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            DataGridViewRow fila = dgvCompras.Rows[e.RowIndex];
+            compraIdSeleccionado = Convert.ToInt32(fila.Cells[colCodigo.Index].Value);
+            compraSeleccionado = $"la compra con factura N° {fila.Cells[colNumFact.Index].Value} de {fila.Cells[colProveedor.Index].Value}";
+            btnEliminar.Enabled = true;
         }
 
         private void dgvCompras_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)

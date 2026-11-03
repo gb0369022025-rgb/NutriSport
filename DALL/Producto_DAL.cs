@@ -27,7 +27,8 @@ namespace NutriSport.DAL
                                 NombreProducto = reader["Producto"].ToString() ?? string.Empty,
                                 Precio = Convert.ToDecimal(reader["P. Unitario"]),
                                 Existencia = Convert.ToInt32(reader["Existencia"]),
-                                CategoriaId = Convert.ToInt32(categoria.Substring(0, categoria.IndexOf(" - ")))
+                                CategoriaId = Convert.ToInt32(categoria.Substring(0, categoria.IndexOf(" - "))),
+                                CodigoBarras = reader["Codigo Barras"] != DBNull.Value ? reader["Codigo Barras"].ToString() : null
                             });
                         }
                     }
@@ -53,7 +54,8 @@ namespace NutriSport.DAL
                                 ProductoId = Convert.ToInt16(reader["Codigo"]),
                                 NombreProducto = reader["Producto"].ToString() ?? string.Empty,
                                 Precio = Convert.ToDecimal(reader["Precio"]),
-                                Existencia = Convert.ToInt32(reader["Existencia"])
+                                Existencia = Convert.ToInt32(reader["Existencia"]),
+                                CodigoBarras = reader["Codigo Barras"] != DBNull.Value ? reader["Codigo Barras"].ToString() : null
                             });
                         }
                     }
@@ -72,6 +74,7 @@ namespace NutriSport.DAL
                     cmd.Parameters.AddWithValue("@Precio", entidad.Precio);
                     cmd.Parameters.AddWithValue("@Existencia", entidad.Existencia);
                     cmd.Parameters.AddWithValue("@CategoriaId", (object?)entidad.CategoriaId ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@CodigoBarras", (object?)entidad.CodigoBarras ?? DBNull.Value);
                     return cmd.ExecuteNonQuery();
                 }
             }
@@ -88,7 +91,46 @@ namespace NutriSport.DAL
                     cmd.Parameters.AddWithValue("@Precio", entidad.Precio);
                     cmd.Parameters.AddWithValue("@Existencia", entidad.Existencia);
                     cmd.Parameters.AddWithValue("@CategoriaId", (object?)entidad.CategoriaId ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@CodigoBarras", (object?)entidad.CodigoBarras ?? DBNull.Value);
                     return cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public static int Eliminar(int id)
+        {
+            using (var conn = BDComun.ObtenerConexion())
+            {
+                using (var cmd = BDComun.ObtenerComando("SpDeleteProducto", conn))
+                {
+                    cmd.Parameters.AddWithValue("@ProductoId", id);
+                    return cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public static Producto? BuscarPorCodigoBarras(string codigoBarras)
+        {
+            using (var conn = BDComun.ObtenerConexion())
+            {
+                using (var cmd = BDComun.ObtenerComando("SpSelectProductoCodigoBarras", conn))
+                {
+                    cmd.Parameters.AddWithValue("@CodigoBarras", codigoBarras);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (!reader.Read()) return null;
+
+                        string categoria = reader["Categoria"].ToString() ?? string.Empty;
+                        return new Producto
+                        {
+                            ProductoId = Convert.ToInt16(reader["Cod."]),
+                            NombreProducto = reader["Producto"].ToString() ?? string.Empty,
+                            Precio = Convert.ToDecimal(reader["P. Unitario"]),
+                            Existencia = Convert.ToInt32(reader["Existencia"]),
+                            CategoriaId = Convert.ToInt32(categoria.Substring(0, categoria.IndexOf(" - "))),
+                            CodigoBarras = reader["Codigo Barras"].ToString()
+                        };
+                    }
                 }
             }
         }

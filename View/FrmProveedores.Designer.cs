@@ -45,6 +45,7 @@
             txtTelefono = new TextBox();
             btnAgregar = new Button();
             btnLimpiar = new Button();
+            btnEliminar = new Button();
             panelContenido = new Panel();
             dgvProveedores = new DataGridView();
             colCodigo = new DataGridViewTextBoxColumn();
@@ -127,6 +128,7 @@
             // 
             // panelDatos
             // 
+            panelDatos.Controls.Add(btnEliminar);
             panelDatos.Controls.Add(btnLimpiar);
             panelDatos.Controls.Add(btnAgregar);
             panelDatos.Controls.Add(lblTelefono);
@@ -221,6 +223,19 @@
             btnLimpiar.UseVisualStyleBackColor = false;
             btnLimpiar.Click += btnLimpiar_Click;
             // 
+            // btnEliminar
+            // 
+            btnEliminar.BackColor = Color.FromArgb(230, 235, 240);
+            btnEliminar.FlatStyle = FlatStyle.Flat;
+            btnEliminar.Enabled = false;
+            btnEliminar.Location = new Point(20, 267);
+            btnEliminar.Name = "btnEliminar";
+            btnEliminar.Size = new Size(155, 38);
+            btnEliminar.TabIndex = 8;
+            btnEliminar.Text = "Eliminar";
+            btnEliminar.UseVisualStyleBackColor = false;
+            btnEliminar.Click += btnEliminar_Click;
+            // 
             // panelContenido
             // 
             panelContenido.Controls.Add(dgvProveedores);
@@ -274,7 +289,8 @@
             dgvProveedores.RowTemplate.Height = 32;
             dgvProveedores.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvProveedores.Size = new Size(692, 473);
-            dgvProveedores.TabIndex = 8;
+            dgvProveedores.TabIndex = 9;
+            dgvProveedores.CellClick += dgvProveedores_CellClick;
             dgvProveedores.DataBindingComplete += dgvProveedores_DataBindingComplete;
             // 
             // colCodigo
@@ -357,6 +373,7 @@
         private TextBox txtTelefono;
         private Button btnAgregar;
         private Button btnLimpiar;
+        private Button btnEliminar;
         private Panel panelContenido;
         private DataGridView dgvProveedores;
         private DataGridViewTextBoxColumn colCodigo;

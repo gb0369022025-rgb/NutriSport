@@ -49,6 +49,7 @@
             cboEstado = new ComboBox();
             btnAgregar = new Button();
             btnLimpiar = new Button();
+            btnEliminar = new Button();
             panelContenido = new Panel();
             dgvUsuarios = new DataGridView();
             colCodigo = new DataGridViewTextBoxColumn();
@@ -132,6 +133,7 @@
             // 
             // panelDatos
             // 
+            panelDatos.Controls.Add(btnEliminar);
             panelDatos.Controls.Add(btnLimpiar);
             panelDatos.Controls.Add(btnAgregar);
             panelDatos.Controls.Add(lblEstadoRegistro);
@@ -273,6 +275,19 @@
             btnLimpiar.UseVisualStyleBackColor = false;
             btnLimpiar.Click += btnLimpiar_Click;
             // 
+            // btnEliminar
+            // 
+            btnEliminar.BackColor = Color.FromArgb(230, 235, 240);
+            btnEliminar.FlatStyle = FlatStyle.Flat;
+            btnEliminar.Enabled = false;
+            btnEliminar.Location = new Point(20, 332);
+            btnEliminar.Name = "btnEliminar";
+            btnEliminar.Size = new Size(155, 38);
+            btnEliminar.TabIndex = 12;
+            btnEliminar.Text = "Eliminar";
+            btnEliminar.UseVisualStyleBackColor = false;
+            btnEliminar.Click += btnEliminar_Click;
+            // 
             // panelContenido
             // 
             panelContenido.Controls.Add(dgvUsuarios);
@@ -326,7 +341,8 @@
             dgvUsuarios.RowTemplate.Height = 32;
             dgvUsuarios.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvUsuarios.Size = new Size(692, 473);
-            dgvUsuarios.TabIndex = 12;
+            dgvUsuarios.TabIndex = 13;
+            dgvUsuarios.CellClick += dgvUsuarios_CellClick;
             dgvUsuarios.DataBindingComplete += dgvUsuarios_DataBindingComplete;
             // 
             // colCodigo
@@ -423,6 +439,7 @@
         private ComboBox cboEstado;
         private Button btnAgregar;
         private Button btnLimpiar;
+        private Button btnEliminar;
         private Panel panelContenido;
         private DataGridView dgvUsuarios;
         private DataGridViewTextBoxColumn colCodigo;

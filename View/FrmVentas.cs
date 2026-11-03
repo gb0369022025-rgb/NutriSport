@@ -6,6 +6,8 @@ namespace View
     public partial class FrmVentas : Form
     {
         private const string Titulo = "Ventas";
+        private int ventaIdSeleccionado = 0;
+        private string ventaSeleccionado = string.Empty;
         private List<Cliente> clientes = new List<Cliente>();
 
         public FrmVentas()
@@ -134,6 +136,8 @@ namespace View
 
         private void LimpiarCampos()
         {
+            ventaIdSeleccionado = 0;
+            btnEliminar.Enabled = false;
             dtpFecha.Value = DateTime.Today;
             VaciarSeleccion(cboCliente);
             cboEstado.SelectedIndex = 0;
@@ -187,6 +191,40 @@ namespace View
             }
         }
 
+        private async void btnEliminar_Click(object sender, EventArgs e)
+        {
+            if (ventaIdSeleccionado == 0)
+            {
+                MessageBox.Show("Selecciona en la lista la venta que quieres eliminar.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DialogResult respuesta = MessageBox.Show($"¿Eliminar {ventaSeleccionado}? Sus productos se devolverán a la existencia.",
+                Titulo, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (respuesta != DialogResult.Yes) return;
+
+            int id = ventaIdSeleccionado;
+            MostrarOcupado(true, "Eliminando...");
+            try
+            {
+                int filas = await EnSegundoPlano(() => Venta_BL.Eliminar(id));
+                if (IsDisposed) return;
+                MessageBox.Show(filas > 0 ? "Venta eliminada." : "La venta ya no existe. Se actualizará la lista.",
+                    Titulo, MessageBoxButtons.OK, filas > 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+                await CargarVentasAsync();
+                LimpiarCampos();
+            }
+            catch (Exception ex)
+            {
+                if (IsDisposed) return;
+                MessageBox.Show("No se pudo eliminar la venta.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+        }
+
         // Cierra esta ventana y regresa al formulario principal
         private void btnVolver_Click(object sender, EventArgs e)
         {
@@ -196,6 +234,15 @@ namespace View
         private void btnLimpiar_Click(object sender, EventArgs e)
         {
             LimpiarCampos();
+        }
+
+        private void dgvVentas_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            DataGridViewRow fila = dgvVentas.Rows[e.RowIndex];
+            ventaIdSeleccionado = Convert.ToInt32(fila.Cells[colIdVenta.Index].Value);
+            ventaSeleccionado = $"la venta N° {ventaIdSeleccionado} de {fila.Cells[colCliente.Index].Value}";
+            btnEliminar.Enabled = true;
         }
 
         private void dgvVentas_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)

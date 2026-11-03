@@ -7,6 +7,7 @@
 		public decimal Precio { get; set; }
 		public int Existencia { get; set; }
 		public int? CategoriaId { get; set; }
+		public string? CodigoBarras { get; set; }
 		public int Estado { get; set; } = 1;
 	}
 }

@@ -56,6 +56,7 @@
             nudTotalPagar = new NumericUpDown();
             btnAgregar = new Button();
             btnLimpiar = new Button();
+            btnEliminar = new Button();
             panelContenido = new Panel();
             dgvCompras = new DataGridView();
             colCodigo = new DataGridViewTextBoxColumn();
@@ -145,6 +146,7 @@
             // 
             // panelDatos
             // 
+            panelDatos.Controls.Add(btnEliminar);
             panelDatos.Controls.Add(btnLimpiar);
             panelDatos.Controls.Add(btnAgregar);
             panelDatos.Controls.Add(lblTotalPagar);
@@ -330,6 +332,19 @@
             btnLimpiar.UseVisualStyleBackColor = false;
             btnLimpiar.Click += btnLimpiar_Click;
             // 
+            // btnEliminar
+            // 
+            btnEliminar.BackColor = Color.FromArgb(230, 235, 240);
+            btnEliminar.FlatStyle = FlatStyle.Flat;
+            btnEliminar.Enabled = false;
+            btnEliminar.Location = new Point(20, 396);
+            btnEliminar.Name = "btnEliminar";
+            btnEliminar.Size = new Size(155, 38);
+            btnEliminar.TabIndex = 16;
+            btnEliminar.Text = "Eliminar";
+            btnEliminar.UseVisualStyleBackColor = false;
+            btnEliminar.Click += btnEliminar_Click;
+            // 
             // panelContenido
             // 
             panelContenido.Controls.Add(dgvCompras);
@@ -383,7 +398,8 @@
             dgvCompras.RowTemplate.Height = 32;
             dgvCompras.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvCompras.Size = new Size(692, 473);
-            dgvCompras.TabIndex = 16;
+            dgvCompras.TabIndex = 17;
+            dgvCompras.CellClick += dgvCompras_CellClick;
             dgvCompras.DataBindingComplete += dgvCompras_DataBindingComplete;
             // 
             // colCodigo
@@ -528,6 +544,7 @@
         private NumericUpDown nudTotalPagar;
         private Button btnAgregar;
         private Button btnLimpiar;
+        private Button btnEliminar;
         private Panel panelContenido;
         private DataGridView dgvCompras;
         private DataGridViewTextBoxColumn colCodigo;

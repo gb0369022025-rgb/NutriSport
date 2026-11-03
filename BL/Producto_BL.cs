@@ -25,5 +25,15 @@ namespace NutriSport.BL
         {
             return Producto_DAL.Modificar(entidad);
         }
+
+        public static int Eliminar(int id)
+        {
+            return Producto_DAL.Eliminar(id);
+        }
+
+        public static Producto? BuscarPorCodigoBarras(string codigoBarras)
+        {
+            return Producto_DAL.BuscarPorCodigoBarras(codigoBarras);
+        }
     }
 }

@@ -20,5 +20,10 @@ namespace NutriSport.BL
         {
             return Cliente_DAL.Modificar(entidad);
         }
+
+        public static int Eliminar(int id)
+        {
+            return Cliente_DAL.Eliminar(id);
+        }
     }
 }

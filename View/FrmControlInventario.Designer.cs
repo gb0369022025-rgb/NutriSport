@@ -50,6 +50,7 @@
             txtObservacion = new TextBox();
             btnAgregar = new Button();
             btnLimpiar = new Button();
+            btnEliminar = new Button();
             panelContenido = new Panel();
             dgvControlInventario = new DataGridView();
             colCodigo = new DataGridViewTextBoxColumn();
@@ -135,6 +136,7 @@
             // 
             // panelDatos
             // 
+            panelDatos.Controls.Add(btnEliminar);
             panelDatos.Controls.Add(btnLimpiar);
             panelDatos.Controls.Add(btnAgregar);
             panelDatos.Controls.Add(lblObservacion);
@@ -276,6 +278,19 @@
             btnLimpiar.UseVisualStyleBackColor = false;
             btnLimpiar.Click += btnLimpiar_Click;
             // 
+            // btnEliminar
+            // 
+            btnEliminar.BackColor = Color.FromArgb(230, 235, 240);
+            btnEliminar.FlatStyle = FlatStyle.Flat;
+            btnEliminar.Enabled = false;
+            btnEliminar.Location = new Point(20, 405);
+            btnEliminar.Name = "btnEliminar";
+            btnEliminar.Size = new Size(155, 38);
+            btnEliminar.TabIndex = 12;
+            btnEliminar.Text = "Eliminar";
+            btnEliminar.UseVisualStyleBackColor = false;
+            btnEliminar.Click += btnEliminar_Click;
+            // 
             // panelContenido
             // 
             panelContenido.Controls.Add(dgvControlInventario);
@@ -329,7 +344,8 @@
             dgvControlInventario.RowTemplate.Height = 32;
             dgvControlInventario.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvControlInventario.Size = new Size(692, 473);
-            dgvControlInventario.TabIndex = 12;
+            dgvControlInventario.TabIndex = 13;
+            dgvControlInventario.CellClick += dgvControlInventario_CellClick;
             dgvControlInventario.DataBindingComplete += dgvControlInventario_DataBindingComplete;
             // 
             // colCodigo
@@ -440,6 +456,7 @@
         private TextBox txtObservacion;
         private Button btnAgregar;
         private Button btnLimpiar;
+        private Button btnEliminar;
         private Panel panelContenido;
         private DataGridView dgvControlInventario;
         private DataGridViewTextBoxColumn colCodigo;

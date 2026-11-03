@@ -12,4 +12,8 @@
     <ProjectReference Include="..\BL\NutriSport.BL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.*" />
+  </ItemGroup>
+
 </Project>

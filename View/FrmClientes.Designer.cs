@@ -49,6 +49,7 @@
             txtEmail = new TextBox();
             btnAgregar = new Button();
             btnModificar = new Button();
+            btnEliminar = new Button();
             btnLimpiar = new Button();
             panelContenido = new Panel();
             dgvClientes = new DataGridView();
@@ -135,6 +136,7 @@
             // panelDatos
             // 
             panelDatos.Controls.Add(btnLimpiar);
+            panelDatos.Controls.Add(btnEliminar);
             panelDatos.Controls.Add(btnModificar);
             panelDatos.Controls.Add(btnAgregar);
             panelDatos.Controls.Add(lblEmail);
@@ -272,14 +274,27 @@
             btnModificar.UseVisualStyleBackColor = false;
             btnModificar.Click += btnModificar_Click;
             // 
+            // btnEliminar
+            // 
+            btnEliminar.BackColor = Color.FromArgb(230, 235, 240);
+            btnEliminar.FlatStyle = FlatStyle.Flat;
+            btnEliminar.Enabled = false;
+            btnEliminar.Location = new Point(20, 330);
+            btnEliminar.Name = "btnEliminar";
+            btnEliminar.Size = new Size(155, 38);
+            btnEliminar.TabIndex = 12;
+            btnEliminar.Text = "Eliminar";
+            btnEliminar.UseVisualStyleBackColor = false;
+            btnEliminar.Click += btnEliminar_Click;
+            // 
             // btnLimpiar
             // 
             btnLimpiar.BackColor = Color.FromArgb(230, 235, 240);
             btnLimpiar.FlatStyle = FlatStyle.Flat;
-            btnLimpiar.Location = new Point(20, 330);
+            btnLimpiar.Location = new Point(185, 330);
             btnLimpiar.Name = "btnLimpiar";
             btnLimpiar.Size = new Size(155, 38);
-            btnLimpiar.TabIndex = 12;
+            btnLimpiar.TabIndex = 13;
             btnLimpiar.Text = "Limpiar";
             btnLimpiar.UseVisualStyleBackColor = false;
             btnLimpiar.Click += btnLimpiar_Click;
@@ -337,7 +352,7 @@
             dgvClientes.RowTemplate.Height = 32;
             dgvClientes.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             dgvClientes.Size = new Size(692, 473);
-            dgvClientes.TabIndex = 13;
+            dgvClientes.TabIndex = 14;
             dgvClientes.CellClick += dgvClientes_CellClick;
             dgvClientes.DataBindingComplete += dgvClientes_DataBindingComplete;
             // 
@@ -444,6 +459,7 @@
         private TextBox txtEmail;
         private Button btnAgregar;
         private Button btnModificar;
+        private Button btnEliminar;
         private Button btnLimpiar;
         private Panel panelContenido;
         private DataGridView dgvClientes;

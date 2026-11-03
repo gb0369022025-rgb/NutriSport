@@ -6,6 +6,8 @@ namespace View
     public partial class FrmEmpleados : Form
     {
         private const string Titulo = "Empleados";
+        private int empleadoIdSeleccionado = 0;
+        private string empleadoSeleccionado = string.Empty;
 
         public FrmEmpleados()
         {
@@ -93,6 +95,8 @@ namespace View
 
         private void LimpiarCampos()
         {
+            empleadoIdSeleccionado = 0;
+            btnEliminar.Enabled = false;
             txtNombre.Clear();
             txtApellido.Clear();
             txtTelefono.Clear();
@@ -148,6 +152,40 @@ namespace View
             }
         }
 
+        private async void btnEliminar_Click(object sender, EventArgs e)
+        {
+            if (empleadoIdSeleccionado == 0)
+            {
+                MessageBox.Show("Selecciona en la lista el empleado que quieres eliminar.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DialogResult respuesta = MessageBox.Show($"¿Eliminar {empleadoSeleccionado}?",
+                Titulo, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (respuesta != DialogResult.Yes) return;
+
+            int id = empleadoIdSeleccionado;
+            MostrarOcupado(true, "Eliminando...");
+            try
+            {
+                int filas = await EnSegundoPlano(() => Empleado_BL.Eliminar(id));
+                if (IsDisposed) return;
+                MessageBox.Show(filas > 0 ? "Empleado eliminado." : "El empleado ya no existe. Se actualizará la lista.",
+                    Titulo, MessageBoxButtons.OK, filas > 0 ? MessageBoxIcon.Information : MessageBoxIcon.Warning);
+                await CargarEmpleadosAsync();
+                LimpiarCampos();
+            }
+            catch (Exception ex)
+            {
+                if (IsDisposed) return;
+                MessageBox.Show("No se pudo eliminar el empleado.\n\nDetalle: " + ex.Message, Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+        }
+
         // Cierra esta ventana y regresa al formulario principal
         private void btnVolver_Click(object sender, EventArgs e)
         {
@@ -157,6 +195,15 @@ namespace View
         private void btnLimpiar_Click(object sender, EventArgs e)
         {
             LimpiarCampos();
+        }
+
+        private void dgvEmpleados_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            DataGridViewRow fila = dgvEmpleados.Rows[e.RowIndex];
+            empleadoIdSeleccionado = Convert.ToInt32(fila.Cells[colCodigo.Index].Value);
+            empleadoSeleccionado = $"al empleado \"{fila.Cells[colNombre.Index].Value} {fila.Cells[colApellido.Index].Value}\"";
+            btnEliminar.Enabled = true;
         }
 
         private void dgvEmpleados_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)
