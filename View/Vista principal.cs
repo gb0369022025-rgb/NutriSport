@@ -12,6 +12,33 @@ namespace View
         public NutriSport()
         {
             InitializeComponent();
+            CargarLogo();
+        }
+
+        private void CargarLogo()
+        {
+            var ensamblado = typeof(Program).Assembly;
+            using (Stream? icono = ensamblado.GetManifestResourceStream("logo.ico"))
+            {
+                if (icono != null) Icon = new Icon(icono);
+            }
+            using (Stream? imagen = ensamblado.GetManifestResourceStream("logo.png"))
+            {
+                if (imagen != null)
+                {
+                    using Image original = Image.FromStream(imagen);
+                    picLogo.Image = new Bitmap(original);
+                }
+            }
+        }
+
+        public void MostrarUsuario(Usuario usuario)
+        {
+            lblUsuario.Text = string.IsNullOrWhiteSpace(usuario.NombreEmpleado)
+                ? $"{usuario.Nombre} ({usuario.Tipo})"
+                : $"{usuario.NombreEmpleado} ({usuario.Tipo})";
+            lblUsuario.Left = panelSuperior.ClientSize.Width - lblUsuario.PreferredWidth - 20;
+            Text = $"NutriSport - Sistema de Gestión - {usuario.Nombre}";
         }
 
         private async void NutriSport_Load(object sender, EventArgs e)
@@ -83,6 +110,7 @@ namespace View
         {
             using (formulario)
             {
+                formulario.Icon = Icon;
                 formulario.ShowDialog(this);
             }
             await CargarDashboardAsync();

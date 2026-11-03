@@ -255,9 +255,10 @@ namespace View
         {
             if (!ValidarCampos()) return;
 
+            dtpFecha.Value = DateTime.Today;
             var venta = new Venta
             {
-                FechaVenta = dtpFecha.Value.Date,
+                FechaVenta = DateTime.Today,
                 ClienteId = Convert.ToInt32(cboCliente.SelectedValue),
                 Estado = cboEstado.Text,
                 Descripcion = txtDescripcion.Text.Trim()

@@ -514,7 +514,7 @@ as
 begin
 	select UsuarioId, Nombre, NombreEmpleado, Tipo, Estado
 	from USUARIO
-	where Nombre = @Nombre and Clave = @Clave and Estado = 'Activo';
+	where Nombre = @Nombre and Clave = @Clave collate Latin1_General_CS_AS and Estado = 'Activo';
 end;
 GO
 

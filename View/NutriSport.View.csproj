@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>Recursos\logo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +15,11 @@
 
   <ItemGroup>
     <PackageReference Include="ZXing.Net.Bindings.Windows.Compatibility" Version="0.16.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Recursos\logo.ico" LogicalName="logo.ico" />
+    <EmbeddedResource Include="Recursos\logo.png" LogicalName="logo.png" />
   </ItemGroup>
 
 </Project>

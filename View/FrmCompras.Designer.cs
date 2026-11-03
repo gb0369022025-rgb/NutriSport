@@ -183,6 +183,7 @@
             // 
             dtpFechaHora.CustomFormat = "dd/MM/yyyy HH:mm";
             dtpFechaHora.Format = DateTimePickerFormat.Custom;
+            dtpFechaHora.Enabled = false;
             dtpFechaHora.Location = new Point(20, 42);
             dtpFechaHora.Name = "dtpFechaHora";
             dtpFechaHora.Size = new Size(320, 27);

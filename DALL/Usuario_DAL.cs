@@ -61,5 +61,30 @@ namespace NutriSport.DAL
                 }
             }
         }
+
+        public static Usuario? IniciarSesion(string nombre, string clave)
+        {
+            using (var conn = BDComun.ObtenerConexion())
+            {
+                using (var cmd = BDComun.ObtenerComando("SpUsuarioLogin", conn))
+                {
+                    cmd.Parameters.AddWithValue("@Nombre", nombre);
+                    cmd.Parameters.AddWithValue("@Clave", clave);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (!reader.Read()) return null;
+
+                        return new Usuario
+                        {
+                            UsuarioId = Convert.ToInt32(reader["UsuarioId"]),
+                            Nombre = reader["Nombre"].ToString() ?? string.Empty,
+                            NombreEmpleado = reader["NombreEmpleado"].ToString() ?? string.Empty,
+                            Tipo = reader["Tipo"].ToString() ?? string.Empty,
+                            Estado = reader["Estado"].ToString() ?? string.Empty
+                        };
+                    }
+                }
+            }
+        }
     }
 }

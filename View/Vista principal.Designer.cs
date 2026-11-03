@@ -47,6 +47,8 @@
             btnEmpleados = new Button();
             btnUsuarios = new Button();
             lblUsuario = new Label();
+            picLogo = new PictureBox();
+            lblSistema = new Label();
             lblEstado = new Label();
             lblBienvenida = new Label();
             panelCardPedidos = new Panel();
@@ -64,6 +66,7 @@
             button2 = new Button();
             panelLateral.SuspendLayout();
             panelSuperior.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)picLogo).BeginInit();
             panelInferior.SuspendLayout();
             panelCardPedidos.SuspendLayout();
             panel1.SuspendLayout();
@@ -98,6 +101,8 @@
             // panelSuperior
             // 
             panelSuperior.BackColor = Color.White;
+            panelSuperior.Controls.Add(lblSistema);
+            panelSuperior.Controls.Add(picLogo);
             panelSuperior.Controls.Add(lblUsuario);
             panelSuperior.Dock = DockStyle.Top;
             panelSuperior.Location = new Point(250, 0);
@@ -322,6 +327,26 @@
             btnUsuarios.UseVisualStyleBackColor = true;
             btnUsuarios.Click += btnUsuarios_Click;
             // 
+            // picLogo
+            // 
+            picLogo.Location = new Point(20, 10);
+            picLogo.Name = "picLogo";
+            picLogo.Size = new Size(40, 40);
+            picLogo.SizeMode = PictureBoxSizeMode.Zoom;
+            picLogo.TabIndex = 1;
+            picLogo.TabStop = false;
+            // 
+            // lblSistema
+            // 
+            lblSistema.AutoSize = true;
+            lblSistema.Font = new Font("Segoe UI", 13F, FontStyle.Bold);
+            lblSistema.ForeColor = Color.FromArgb(24, 30, 54);
+            lblSistema.Location = new Point(68, 14);
+            lblSistema.Name = "lblSistema";
+            lblSistema.Size = new Size(120, 30);
+            lblSistema.TabIndex = 2;
+            lblSistema.Text = "NutriSport";
+            // 
             // lblUsuario
             // 
             lblUsuario.AutoSize = true;
@@ -504,6 +529,7 @@
             Load += NutriSport_Load;
             panelLateral.ResumeLayout(false);
             panelLateral.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)picLogo).EndInit();
             panelSuperior.ResumeLayout(false);
             panelSuperior.PerformLayout();
             panelInferior.ResumeLayout(false);
@@ -541,6 +567,8 @@
         private Button btnUsuarios;
         private Label lblCatAdmin;
         private Label lblUsuario;
+        private PictureBox picLogo;
+        private Label lblSistema;
         private Label lblEstado;
         private Label lblBienvenida;
         private Panel panelCardPedidos;

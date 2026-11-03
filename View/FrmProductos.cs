@@ -367,7 +367,7 @@ namespace View
                 g.DrawString(precio, fuente, Brushes.Black, 20, 38);
                 g.DrawImage(imagen, 20, 60, 200, 70);
             };
-            using var vistaPrevia = new PrintPreviewDialog { Document = documento, Width = 800, Height = 600 };
+            using var vistaPrevia = new PrintPreviewDialog { Document = documento, Width = 800, Height = 600, Icon = Icon };
             vistaPrevia.ShowDialog(this);
         }
 

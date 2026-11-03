@@ -172,7 +172,7 @@ namespace View
 
             var compra = new Compra
             {
-                FechaHora = dtpFechaHora.Value,
+                FechaHora = DateTime.Now,
                 NombreProveedor = Convert.ToInt16(cboProveedor.SelectedValue),
                 NumFact = (int)nudNumFact.Value,
                 NombreUsuario = Convert.ToInt32(cboUsuario.SelectedValue),

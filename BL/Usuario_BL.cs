@@ -20,5 +20,10 @@ namespace NutriSport.BL
         {
             return Usuario_DAL.Eliminar(id);
         }
+
+        public static Usuario? IniciarSesion(string nombre, string clave)
+        {
+            return Usuario_DAL.IniciarSesion(nombre, clave);
+        }
     }
 }
