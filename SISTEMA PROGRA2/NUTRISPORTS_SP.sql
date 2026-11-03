@@ -1,8 +1,8 @@
-/*
+Ôªø/*
 	Fecha: 08 de octubre de 2026
-	Integrantes: Marlon Alexander ¡lvarez Cea
-				 Anderson Wilfredo ¡revalo Gonzalez
-				 Jose Fernando GarcÌa Beteta
+	Integrantes: Marlon Alexander √Ålvarez Cea
+				 Anderson Wilfredo √Årevalo Gonzalez
+				 Jose Fernando Garc√≠a Beteta
 				 Danilo Alejandro Linares Escalante
 	Proyecto: Sistema NUTRISPORT
 */
@@ -12,7 +12,7 @@ go
 create procedure SpSelectAllCategoria
 as
 begin
-	select CategoriaId as 'CÛdigo',
+	select CategoriaId as 'C√≥digo',
 	       Categoria as 'Nombre Categoria' 
 	from CATEGORIA
 	where Estado = 1
@@ -26,7 +26,7 @@ as
 begin
 	if exists(select * from CATEGORIA where Categoria = @Categoria)
 		begin
-			print 'La categorÌa que intenta registrar ya existe en la BD.'
+			print 'La categor√≠a que intenta registrar ya existe en la BD.'
 		end
 	else
 		begin
@@ -42,7 +42,7 @@ as
 begin
 	if exists (select * from CATEGORIA where Categoria = @Categoria and CategoriaId <> @CategoriaId)
 		begin
-			print 'La categorÌa que intenta modificar ya existe.'
+			print 'La categor√≠a que intenta modificar ya existe.'
 		end
 	else
 		begin
@@ -117,7 +117,7 @@ begin
 	if exists(select * from PRODUCTO where Producto = @Producto)
 	   or exists(select * from PRODUCTO where CodigoBarras = @CodigoBarras)
 		begin
-			print 'El producto o el cÛdigo de barras ya existe en la BD.'
+			print 'El producto o el c√≥digo de barras ya existe en la BD.'
 		end
 	else
 		begin
@@ -141,7 +141,7 @@ begin
 	if exists (select * from PRODUCTO where Producto = @Producto and ProductoId <> @ProductoId)
 	   or exists (select * from PRODUCTO where CodigoBarras = @CodigoBarras and ProductoId <> @ProductoId)
 		begin
-			print 'El producto o el cÛdigo de barras ya existe.'
+			print 'El producto o el c√≥digo de barras ya existe.'
 		end
 	else
 		begin
@@ -169,10 +169,10 @@ go
 create procedure SpSelectAllCliente
 as
 begin
-	select ClienteId as 'CÛdigo',
+	select ClienteId as 'C√≥digo',
 	       Nombre as 'Nombre',
 	       Apellido as 'Apellido',
-	       Telefono as 'TelÈfono',
+	       Telefono as 'Tel√©fono',
 	       Email as 'Correo',
 	       DUI as 'DUI'
 	from CLIENTE
@@ -239,10 +239,10 @@ go
 create procedure SpSelectAllProveedor
 as
 begin
-	select ProveedorId as 'CÛdigo',
+	select ProveedorId as 'C√≥digo',
 	       Nombre as 'Nombre',
-	       Direccion as 'DirecciÛn',
-	       Telefono as 'TelÈfono'
+	       Direccion as 'Direcci√≥n',
+	       Telefono as 'Tel√©fono'
 	from PROVEEDOR
 	where Estado = 1
 	order by Nombre asc;
@@ -302,9 +302,9 @@ go
 create procedure SpSelectAllRol
 as
 begin
-	select RolId as 'CÛdigo',
+	select RolId as 'C√≥digo',
 	       Nombre as 'Rol',
-	       Descripcion as 'DescripciÛn'
+	       Descripcion as 'Descripci√≥n'
 	from ROL
 	where Estado = 1
 	order by Nombre asc;
@@ -361,7 +361,7 @@ go
 create procedure SpSelectAllCargo
 as
 begin
-	select CargoId as 'CÛdigo',
+	select CargoId as 'C√≥digo',
 	       Nombre as 'Cargo'
 	from CARGO
 	where Estado = 1
@@ -413,13 +413,13 @@ go
 create procedure SpSelectAllEmpleado
 as
 begin
-	select e.EmpleadoId as 'CÛdigo',
+	select e.EmpleadoId as 'C√≥digo',
 	       e.Nombre as 'Nombre',
 	       e.Apellido as 'Apellido',
-	       e.Telefono as 'TelÈfono',
+	       e.Telefono as 'Tel√©fono',
 	       e.Email as 'Correo',
 	       e.DUI as 'DUI',
-	       e.Direccion as 'DirecciÛn',
+	       e.Direccion as 'Direcci√≥n',
 	       (cast(e.RolId as varchar) + ' - ' + r.Nombre) as 'Rol',
 	       (cast(e.CargoId as varchar) + ' - ' + c.Nombre) as 'Cargo'
 	from EMPLEADO e
@@ -497,7 +497,7 @@ go
 create procedure SpSelectAllUsuario
 as
 begin
-	select UsuarioId as 'CÛdigo',
+	select UsuarioId as 'C√≥digo',
 	       Nombre as 'Usuario',
 	       NombreEmpleado as 'Empleado',
 	       Tipo as 'Tipo Usuario',
@@ -529,7 +529,7 @@ as
 begin
 	if exists(select * from USUARIO where Nombre = @Nombre)
 		begin
-			print 'El nombre de usuario ya est· ocupado.'
+			print 'El nombre de usuario ya est√° ocupado.'
 		end
 	else
 		begin
@@ -578,8 +578,8 @@ go
 create procedure SpSelectAllPedido
 as
 begin
-	select PedidoId as 'CÛdigo',
-	       NumeroPedido as 'N∞ Pedido',
+	select PedidoId as 'C√≥digo',
+	       NumeroPedido as 'N¬∞ Pedido',
 	       Fecha as 'Fecha Registro',
 	       Estado
 	from PEDIDO
@@ -613,7 +613,7 @@ go
 create procedure SpSelectAllEstado
 as
 begin
-	select EstadoId as 'CÛdigo',
+	select EstadoId as 'C√≥digo',
 	       Nombre as 'Estado'
 	from ESTADO
 	order by Nombre asc;
@@ -633,10 +633,10 @@ go
 create procedure SpSelectAllVenta
 as
 begin
-	select v.IdVenta as 'CÛdigo Venta',
+	select v.IdVenta as 'C√≥digo Venta',
 	       v.FechaVenta as 'Fecha',
 	       v.Estado as 'Estado',
-	       v.Descripcion as 'DescripciÛn',
+	       v.Descripcion as 'Descripci√≥n',
 	       (cast(v.ClienteId as varchar) + ' - ' + isnull(c.Nombre,'') + ' ' + isnull(c.Apellido,'')) as 'Cliente'
 	from VENTA v
 	left join CLIENTE c on v.ClienteId = c.ClienteId
@@ -670,7 +670,7 @@ begin
 	insert into DETALLE_VENTA (Cantidad, PrecioUnitario, TotalPagar, IdVenta, ProductoId)
 	values (@Cantidad, @PrecioUnitario, @TotalPagar, @IdVenta, @ProductoId);
 
-	-- ActualizaciÛn de inventario
+	-- Actualizaci√≥n de inventario
 	update PRODUCTO
 	set Existencia = Existencia - @Cantidad
 	where ProductoId = @ProductoId;
@@ -681,12 +681,12 @@ create procedure SpSelectDetalleVenta
 	@IdVenta int
 as
 begin
-	select DetalleVentaId as 'CÛdigo Detalle',
+	select DetalleVentaId as 'C√≥digo Detalle',
 	       Cantidad as 'Cantidad',
 	       PrecioUnitario as 'Precio Unitario',
 	       TotalPagar as 'Total Pagar',
-	       IdVenta as 'CÛdigo Venta',
-	       ProductoId as 'CÛdigo Producto'
+	       IdVenta as 'C√≥digo Venta',
+	       ProductoId as 'C√≥digo Producto'
 	from DETALLE_VENTA
 	where IdVenta = @IdVenta
 	order by DetalleVentaId asc;
@@ -752,10 +752,10 @@ go
 create procedure SpSelectAllCompra
 as
 begin
-	select c.CompraId as 'CÛdigo Compra',
+	select c.CompraId as 'C√≥digo Compra',
 	       c.FechaHora as 'Fecha Hora',
 	       (cast(c.NombreProveedor as varchar) + ' - ' + p.Nombre) as 'Proveedor',
-	       c.NumFact as 'N∞ Factura',
+	       c.NumFact as 'N¬∞ Factura',
 	       (cast(c.NombreUsuario as varchar) + ' - ' + u.Nombre) as 'Usuario',
 	       c.SubTotal as 'SubTotal',
 	       c.TotalPagar as 'Total Pagar',
@@ -832,11 +832,11 @@ go
 create procedure SpSelectAllControlInventario
 as
 begin
-	select ci.ControlInvId as 'CÛdigo Control',
+	select ci.ControlInvId as 'C√≥digo Control',
 	       (cast(ci.NombreUsuario as varchar) + ' - ' + u.Nombre) as 'Usuario',
 	       ci.FechaHora as 'Fecha Hora',
 	       ci.CantProducto as 'Cantidad Productos',
-	       ci.Observacion as 'ObservaciÛn',
+	       ci.Observacion as 'Observaci√≥n',
 	       ci.Estado
 	from CONTROL_INVENTARIO ci
 	inner join USUARIO u on ci.NombreUsuario = u.UsuarioId
@@ -888,10 +888,10 @@ go
 create procedure SpSelectAllDetControlInv
 as
 begin
-	select DetControlInvId as 'CÛdigo',
+	select DetControlInvId as 'C√≥digo',
 	       Cantidad as 'Cantidad',
-	       Observacion as 'ObservaciÛn',
-	       NombreControlInv as 'CÛdigo Control'
+	       Observacion as 'Observaci√≥n',
+	       NombreControlInv as 'C√≥digo Control'
 	from DET_CONTROL_INV
 	order by DetControlInvId desc;
 end;
@@ -900,9 +900,9 @@ go
 create procedure SpSelectAllInventario
 as
 begin
-	select InventarioId as 'CÛdigo',
+	select InventarioId as 'C√≥digo',
 	       Existencias as 'Existencias',
-	       FechaActualizacion as 'Fecha ActualizaciÛn'
+	       FechaActualizacion as 'Fecha Actualizaci√≥n'
 	from INVENTARIO
 	order by FechaActualizacion desc;
 end;

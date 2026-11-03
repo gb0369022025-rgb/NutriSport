@@ -1,8 +1,8 @@
-/*
+Ôªø/*
 	Fecha: 08 de octubre de 2026
-	Integrantes: Marlon Alexander ¡lvarez Cea
-				 Anderson Wilfredo ¡revalo Gonzalez
-				 Jose Fernando GarcÌa Beteta
+	Integrantes: Marlon Alexander √Ålvarez Cea
+				 Anderson Wilfredo √Årevalo Gonzalez
+				 Jose Fernando Garc√≠a Beteta
 				 Danilo Alejandro Linares Escalante
 	Proyecto: Sistema NUTRISPORT
 */

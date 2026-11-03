@@ -1,16 +1,16 @@
-use NUTRISPORTS
+Ôªøuse NUTRISPORTS
 
 
 
 INSERT INTO EMPRESA (Nombre, Direccion, Telefono, CNR, Giro) VALUES
-('NutriSport El Salvador S.A. de C.V.', 'Bulevar de Los HÈroes #125, San Salvador', '2225-7000', '198234-5', 'Venta de Ropa, Calzado Deportivo y Suplementos');
+('NutriSport El Salvador S.A. de C.V.', 'Bulevar de Los H√©roes #125, San Salvador', '2225-7000', '198234-5', 'Venta de Ropa, Calzado Deportivo y Suplementos');
 
 
 INSERT INTO CATEGORIA (Categoria, Estado) VALUES
 ('Calzado Deportivo', 1),
 ('Ropa Deportiva', 1),
 ('Accesorios Deportivos', 1),
-('ProteÌnas y Suplementos', 1);
+('Prote√≠nas y Suplementos', 1);
 
 INSERT INTO PRODUCTO (Producto, Precio, Existencia, CategoriaId, Estado) VALUES
 ('Nike Air Zoom Pegasus 40', 145.00, 20, 1, 1),
@@ -44,19 +44,19 @@ SELECT * FROM CARGO;
 
 INSERT INTO EMPLEADO (Nombre, Apellido, Telefono, Email, DUI, Direccion, RolId, CargoId, Estado) VALUES
 ('Mauricio', 'Zelaya', '7011-2233', 'm.zelaya@nutrisport.sv', '03412567-9', 'Santa Tecla, La Libertad', 3, 1, 1),
-('SofÌa', 'Mendoza', '7822-4455', 's.mendoza@nutrisport.sv', '05891234-0', 'Antiguo Cuscatl·n, La Libertad', 2, 2, 1);
+('Sof√≠a', 'Mendoza', '7822-4455', 's.mendoza@nutrisport.sv', '05891234-0', 'Antiguo Cuscatl√°n, La Libertad', 2, 2, 1);
 
 SELECT * FROM EMPLEADO;
 
 
 INSERT INTO USUARIO (Nombre, NombreEmpleado, Clave, Tipo, Estado) VALUES
 ('admin_sv', 'Mauricio Zelaya', 'Nutri2026*', 'Administrador', 'Activo'),
-('smendoza', 'SofÌa Mendoza', 'Ventas2026', 'Vendedor', 'Activo');
+('smendoza', 'Sof√≠a Mendoza', 'Ventas2026', 'Vendedor', 'Activo');
 
 
 INSERT INTO PROVEEDOR (Nombre, Direccion, Telefono, Estado) VALUES
-('Distribuidora Adidas El Salvador', 'CC Multiplaza, Nivel 2, Antiguo Cuscatl·n', '2243-8000', 1),
-('Nike Store Central America', 'CC GalerÌas, EscalÛn, San Salvador', '2264-9100', 1),
+('Distribuidora Adidas El Salvador', 'CC Multiplaza, Nivel 2, Antiguo Cuscatl√°n', '2243-8000', 1),
+('Nike Store Central America', 'CC Galer√≠as, Escal√≥n, San Salvador', '2264-9100', 1),
 ('Sportline El Salvador S.A.', 'Plaza Merliot, Santa Tecla', '2288-3344', 1);
 
 
@@ -69,7 +69,7 @@ INSERT INTO PEDIDO (NumeroPedido, Fecha, Estado) VALUES
 
 
 INSERT INTO VENTA (FechaVenta, Estado, Descripcion, ClienteId) VALUES
-(GETDATE(), 'Completada', 'Compra en tienda fÌsica - Sucursal San Salvador', 1);
+(GETDATE(), 'Completada', 'Compra en tienda f√≠sica - Sucursal San Salvador', 1);
 
 INSERT INTO DETALLE_VENTA (Cantidad, PrecioUnitario, TotalPagar, IdVenta, ProductoId) VALUES
 (1, 145.00, 145.00, 1, 1),
@@ -84,7 +84,7 @@ INSERT INTO DETALLE_COMPRA (NombreCompra, NombreProducto, Cantidad, PrecioUnitar
 (1, 2, 10, 145.00, 1450.00);
 
 INSERT INTO CONTROL_INVENTARIO (NombreUsuario, FechaHora, CantProducto, Observacion, Estado) VALUES
-(1, GETDATE(), 173, 'Conteo fÌsico de calzado y ropa Nike / Adidas', 'Procesado');
+(1, GETDATE(), 173, 'Conteo f√≠sico de calzado y ropa Nike / Adidas', 'Procesado');
 
 INSERT INTO DET_CONTROL_INV (Cantidad, Observacion, NombreControlInv) VALUES
 (20, 'Existencia verificada de Nike Pegasus 40 en bodega', 1);
