@@ -31,6 +31,8 @@
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
             panelSuperior = new Panel();
             lblTitulo = new Label();
             lblSeccion = new Label();
@@ -38,33 +40,26 @@
             panelInferior = new Panel();
             lblEstado = new Label();
             panelDatos = new Panel();
-            lblUsuario = new Label();
-            cboUsuario = new ComboBox();
-            lblFechaHora = new Label();
-            dtpFechaHora = new DateTimePicker();
-            lblCantProducto = new Label();
-            nudCantProducto = new NumericUpDown();
-            lblEstadoRegistro = new Label();
-            cboEstado = new ComboBox();
-            lblObservacion = new Label();
-            txtObservacion = new TextBox();
-            btnAgregar = new Button();
-            btnLimpiar = new Button();
-            btnEliminar = new Button();
             panelContenido = new Panel();
-            dgvControlInventario = new DataGridView();
+            dgvProductos = new DataGridView();
             colCodigo = new DataGridViewTextBoxColumn();
-            colFechaHora = new DataGridViewTextBoxColumn();
-            colUsuario = new DataGridViewTextBoxColumn();
-            colCantProducto = new DataGridViewTextBoxColumn();
-            colObservacion = new DataGridViewTextBoxColumn();
-            colEstado = new DataGridViewTextBoxColumn();
+            colProducto = new DataGridViewTextBoxColumn();
+            colCodigoBarras = new DataGridViewTextBoxColumn();
+            colPrecio = new DataGridViewTextBoxColumn();
+            colExistencia = new DataGridViewTextBoxColumn();
+            lblCategorias = new Label();
+            dgvCategorias = new DataGridView();
+            colCategoriaId = new DataGridViewTextBoxColumn();
+            colCategoria = new DataGridViewTextBoxColumn();
+            colProductos = new DataGridViewTextBoxColumn();
+            colExistenciaTotal = new DataGridViewTextBoxColumn();
+            lblProductos = new Label();
             panelSuperior.SuspendLayout();
             panelInferior.SuspendLayout();
             panelDatos.SuspendLayout();
             panelContenido.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)nudCantProducto).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)dgvControlInventario).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)dgvCategorias).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)dgvProductos).BeginInit();
             SuspendLayout();
             // 
             // panelSuperior
@@ -136,164 +131,19 @@
             // 
             // panelDatos
             // 
-            panelDatos.Controls.Add(btnEliminar);
-            panelDatos.Controls.Add(btnLimpiar);
-            panelDatos.Controls.Add(btnAgregar);
-            panelDatos.Controls.Add(lblObservacion);
-            panelDatos.Controls.Add(txtObservacion);
-            panelDatos.Controls.Add(lblEstadoRegistro);
-            panelDatos.Controls.Add(cboEstado);
-            panelDatos.Controls.Add(lblCantProducto);
-            panelDatos.Controls.Add(nudCantProducto);
-            panelDatos.Controls.Add(lblFechaHora);
-            panelDatos.Controls.Add(dtpFechaHora);
-            panelDatos.Controls.Add(lblUsuario);
-            panelDatos.Controls.Add(cboUsuario);
+            panelDatos.Controls.Add(dgvCategorias);
+            panelDatos.Controls.Add(lblCategorias);
             panelDatos.Dock = DockStyle.Left;
             panelDatos.Location = new Point(0, 60);
             panelDatos.Name = "panelDatos";
+            panelDatos.Padding = new Padding(20, 20, 10, 20);
             panelDatos.Size = new Size(360, 513);
             panelDatos.TabIndex = 1;
             // 
-            // lblUsuario
-            // 
-            lblUsuario.AutoSize = true;
-            lblUsuario.ForeColor = Color.FromArgb(30, 30, 30);
-            lblUsuario.Location = new Point(20, 20);
-            lblUsuario.Name = "lblUsuario";
-            lblUsuario.Size = new Size(148, 20);
-            lblUsuario.TabIndex = 0;
-            lblUsuario.Text = "Usuario responsable";
-            // 
-            // cboUsuario
-            // 
-            cboUsuario.DropDownStyle = ComboBoxStyle.DropDownList;
-            cboUsuario.FormattingEnabled = true;
-            cboUsuario.Location = new Point(20, 42);
-            cboUsuario.Name = "cboUsuario";
-            cboUsuario.Size = new Size(320, 28);
-            cboUsuario.TabIndex = 1;
-            // 
-            // lblFechaHora
-            // 
-            lblFechaHora.AutoSize = true;
-            lblFechaHora.ForeColor = Color.FromArgb(30, 30, 30);
-            lblFechaHora.Location = new Point(20, 84);
-            lblFechaHora.Name = "lblFechaHora";
-            lblFechaHora.Size = new Size(95, 20);
-            lblFechaHora.TabIndex = 2;
-            lblFechaHora.Text = "Fecha y hora";
-            // 
-            // dtpFechaHora
-            // 
-            dtpFechaHora.CustomFormat = "dd/MM/yyyy HH:mm";
-            dtpFechaHora.Format = DateTimePickerFormat.Custom;
-            dtpFechaHora.Location = new Point(20, 106);
-            dtpFechaHora.Name = "dtpFechaHora";
-            dtpFechaHora.Size = new Size(320, 27);
-            dtpFechaHora.TabIndex = 3;
-            // 
-            // lblCantProducto
-            // 
-            lblCantProducto.AutoSize = true;
-            lblCantProducto.ForeColor = Color.FromArgb(30, 30, 30);
-            lblCantProducto.Location = new Point(20, 147);
-            lblCantProducto.Name = "lblCantProducto";
-            lblCantProducto.Size = new Size(163, 20);
-            lblCantProducto.TabIndex = 4;
-            lblCantProducto.Text = "Cantidad de productos";
-            // 
-            // nudCantProducto
-            // 
-            nudCantProducto.Location = new Point(20, 169);
-            nudCantProducto.Maximum = new decimal(new int[] { 1000000, 0, 0, 0 });
-            nudCantProducto.Name = "nudCantProducto";
-            nudCantProducto.Size = new Size(155, 27);
-            nudCantProducto.TabIndex = 5;
-            nudCantProducto.ThousandsSeparator = true;
-            // 
-            // lblEstadoRegistro
-            // 
-            lblEstadoRegistro.AutoSize = true;
-            lblEstadoRegistro.ForeColor = Color.FromArgb(30, 30, 30);
-            lblEstadoRegistro.Location = new Point(185, 147);
-            lblEstadoRegistro.Name = "lblEstadoRegistro";
-            lblEstadoRegistro.Size = new Size(49, 20);
-            lblEstadoRegistro.TabIndex = 6;
-            lblEstadoRegistro.Text = "Estado";
-            // 
-            // cboEstado
-            // 
-            cboEstado.DropDownStyle = ComboBoxStyle.DropDownList;
-            cboEstado.FormattingEnabled = true;
-            cboEstado.Items.AddRange(new object[] { "Procesado", "Pendiente" });
-            cboEstado.Location = new Point(185, 169);
-            cboEstado.Name = "cboEstado";
-            cboEstado.Size = new Size(155, 28);
-            cboEstado.TabIndex = 7;
-            // 
-            // lblObservacion
-            // 
-            lblObservacion.AutoSize = true;
-            lblObservacion.ForeColor = Color.FromArgb(30, 30, 30);
-            lblObservacion.Location = new Point(20, 211);
-            lblObservacion.Name = "lblObservacion";
-            lblObservacion.Size = new Size(87, 20);
-            lblObservacion.TabIndex = 8;
-            lblObservacion.Text = "Observación";
-            // 
-            // txtObservacion
-            // 
-            txtObservacion.Location = new Point(20, 233);
-            txtObservacion.MaxLength = 200;
-            txtObservacion.Multiline = true;
-            txtObservacion.Name = "txtObservacion";
-            txtObservacion.ScrollBars = ScrollBars.Vertical;
-            txtObservacion.Size = new Size(320, 100);
-            txtObservacion.TabIndex = 9;
-            // 
-            // btnAgregar
-            // 
-            btnAgregar.BackColor = Color.FromArgb(46, 51, 73);
-            btnAgregar.FlatAppearance.BorderSize = 0;
-            btnAgregar.FlatStyle = FlatStyle.Flat;
-            btnAgregar.ForeColor = Color.White;
-            btnAgregar.Location = new Point(20, 357);
-            btnAgregar.Name = "btnAgregar";
-            btnAgregar.Size = new Size(155, 38);
-            btnAgregar.TabIndex = 10;
-            btnAgregar.Text = "Agregar";
-            btnAgregar.UseVisualStyleBackColor = false;
-            btnAgregar.Click += btnAgregar_Click;
-            // 
-            // btnLimpiar
-            // 
-            btnLimpiar.BackColor = Color.FromArgb(230, 235, 240);
-            btnLimpiar.FlatStyle = FlatStyle.Flat;
-            btnLimpiar.Location = new Point(185, 357);
-            btnLimpiar.Name = "btnLimpiar";
-            btnLimpiar.Size = new Size(155, 38);
-            btnLimpiar.TabIndex = 11;
-            btnLimpiar.Text = "Limpiar";
-            btnLimpiar.UseVisualStyleBackColor = false;
-            btnLimpiar.Click += btnLimpiar_Click;
-            // 
-            // btnEliminar
-            // 
-            btnEliminar.BackColor = Color.FromArgb(230, 235, 240);
-            btnEliminar.FlatStyle = FlatStyle.Flat;
-            btnEliminar.Enabled = false;
-            btnEliminar.Location = new Point(20, 405);
-            btnEliminar.Name = "btnEliminar";
-            btnEliminar.Size = new Size(155, 38);
-            btnEliminar.TabIndex = 12;
-            btnEliminar.Text = "Eliminar";
-            btnEliminar.UseVisualStyleBackColor = false;
-            btnEliminar.Click += btnEliminar_Click;
-            // 
             // panelContenido
             // 
-            panelContenido.Controls.Add(dgvControlInventario);
+            panelContenido.Controls.Add(dgvProductos);
+            panelContenido.Controls.Add(lblProductos);
             panelContenido.Dock = DockStyle.Fill;
             panelContenido.Location = new Point(360, 60);
             panelContenido.Name = "panelContenido";
@@ -301,16 +151,16 @@
             panelContenido.Size = new Size(722, 513);
             panelContenido.TabIndex = 2;
             // 
-            // dgvControlInventario
+            // dgvProductos
             // 
-            dgvControlInventario.AllowUserToAddRows = false;
-            dgvControlInventario.AllowUserToDeleteRows = false;
-            dgvControlInventario.AllowUserToResizeRows = false;
-            dgvControlInventario.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-            dgvControlInventario.BackgroundColor = Color.White;
-            dgvControlInventario.BorderStyle = BorderStyle.None;
-            dgvControlInventario.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
-            dgvControlInventario.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+            dgvProductos.AllowUserToAddRows = false;
+            dgvProductos.AllowUserToDeleteRows = false;
+            dgvProductos.AllowUserToResizeRows = false;
+            dgvProductos.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvProductos.BackgroundColor = Color.White;
+            dgvProductos.BorderStyle = BorderStyle.None;
+            dgvProductos.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+            dgvProductos.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
             dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle1.BackColor = Color.FromArgb(24, 30, 54);
             dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F);
@@ -319,10 +169,10 @@
             dataGridViewCellStyle1.SelectionBackColor = Color.FromArgb(24, 30, 54);
             dataGridViewCellStyle1.SelectionForeColor = Color.White;
             dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            dgvControlInventario.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            dgvControlInventario.ColumnHeadersHeight = 40;
-            dgvControlInventario.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            dgvControlInventario.Columns.AddRange(new DataGridViewColumn[] { colCodigo, colFechaHora, colUsuario, colCantProducto, colObservacion, colEstado });
+            dgvProductos.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dgvProductos.ColumnHeadersHeight = 40;
+            dgvProductos.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            dgvProductos.Columns.AddRange(new DataGridViewColumn[] { colCodigo, colProducto, colCodigoBarras, colPrecio, colExistencia });
             dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle2.BackColor = Color.White;
             dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
@@ -331,26 +181,25 @@
             dataGridViewCellStyle2.SelectionBackColor = Color.FromArgb(46, 51, 73);
             dataGridViewCellStyle2.SelectionForeColor = Color.White;
             dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
-            dgvControlInventario.DefaultCellStyle = dataGridViewCellStyle2;
-            dgvControlInventario.Dock = DockStyle.Fill;
-            dgvControlInventario.EnableHeadersVisualStyles = false;
-            dgvControlInventario.GridColor = Color.FromArgb(230, 235, 240);
-            dgvControlInventario.Location = new Point(10, 20);
-            dgvControlInventario.MultiSelect = false;
-            dgvControlInventario.Name = "dgvControlInventario";
-            dgvControlInventario.ReadOnly = true;
-            dgvControlInventario.RowHeadersVisible = false;
-            dgvControlInventario.RowHeadersWidth = 51;
-            dgvControlInventario.RowTemplate.Height = 32;
-            dgvControlInventario.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
-            dgvControlInventario.Size = new Size(692, 473);
-            dgvControlInventario.TabIndex = 13;
-            dgvControlInventario.CellClick += dgvControlInventario_CellClick;
-            dgvControlInventario.DataBindingComplete += dgvControlInventario_DataBindingComplete;
+            dgvProductos.DefaultCellStyle = dataGridViewCellStyle2;
+            dgvProductos.Dock = DockStyle.Fill;
+            dgvProductos.EnableHeadersVisualStyles = false;
+            dgvProductos.GridColor = Color.FromArgb(230, 235, 240);
+            dgvProductos.Location = new Point(10, 20);
+            dgvProductos.MultiSelect = false;
+            dgvProductos.Name = "dgvProductos";
+            dgvProductos.ReadOnly = true;
+            dgvProductos.RowHeadersVisible = false;
+            dgvProductos.RowHeadersWidth = 51;
+            dgvProductos.RowTemplate.Height = 32;
+            dgvProductos.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvProductos.Size = new Size(692, 473);
+            dgvProductos.TabIndex = 0;
+            dgvProductos.DataBindingComplete += dgvProductos_DataBindingComplete;
             // 
             // colCodigo
             // 
-            colCodigo.DataPropertyName = "ControlInvId";
+            colCodigo.DataPropertyName = "ProductoId";
             colCodigo.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             colCodigo.FillWeight = 50F;
             colCodigo.HeaderText = "Código";
@@ -358,56 +207,158 @@
             colCodigo.Name = "colCodigo";
             colCodigo.ReadOnly = true;
             // 
-            // colFechaHora
+            // colProducto
             // 
-            colFechaHora.DataPropertyName = "FechaHora";
-            dataGridViewCellStyle3.Format = "dd/MM/yyyy HH:mm";
+            colProducto.DataPropertyName = "NombreProducto";
+            colProducto.FillWeight = 200F;
+            colProducto.HeaderText = "Producto";
+            colProducto.MinimumWidth = 90;
+            colProducto.Name = "colProducto";
+            colProducto.ReadOnly = true;
+            // 
+            // colCodigoBarras
+            // 
+            colCodigoBarras.DataPropertyName = "CodigoBarras";
+            colCodigoBarras.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+            colCodigoBarras.FillWeight = 90F;
+            colCodigoBarras.HeaderText = "Código de barras";
+            colCodigoBarras.MinimumWidth = 6;
+            colCodigoBarras.Name = "colCodigoBarras";
+            colCodigoBarras.ReadOnly = true;
+            // 
+            // colPrecio
+            // 
+            colPrecio.DataPropertyName = "Precio";
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle3.Format = "$#,##0.00";
             dataGridViewCellStyle3.NullValue = null;
-            colFechaHora.DefaultCellStyle = dataGridViewCellStyle3;
-            colFechaHora.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
-            colFechaHora.FillWeight = 95F;
-            colFechaHora.HeaderText = "Fecha y hora";
-            colFechaHora.MinimumWidth = 6;
-            colFechaHora.Name = "colFechaHora";
-            colFechaHora.ReadOnly = true;
+            colPrecio.DefaultCellStyle = dataGridViewCellStyle3;
+            colPrecio.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+            colPrecio.FillWeight = 70F;
+            colPrecio.HeaderText = "Precio";
+            colPrecio.MinimumWidth = 6;
+            colPrecio.Name = "colPrecio";
+            colPrecio.ReadOnly = true;
             // 
-            // colUsuario
+            // colExistencia
             // 
-            colUsuario.DataPropertyName = "Usuario";
-            colUsuario.FillWeight = 80F;
-            colUsuario.HeaderText = "Usuario";
-            colUsuario.MinimumWidth = 90;
-            colUsuario.Name = "colUsuario";
-            colUsuario.ReadOnly = true;
+            colExistencia.DataPropertyName = "Existencia";
+            colExistencia.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+            colExistencia.FillWeight = 70F;
+            colExistencia.HeaderText = "Existencia";
+            colExistencia.MinimumWidth = 6;
+            colExistencia.Name = "colExistencia";
+            colExistencia.ReadOnly = true;
             // 
-            // colCantProducto
+            // lblCategorias
             // 
-            colCantProducto.DataPropertyName = "CantProducto";
-            colCantProducto.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
-            colCantProducto.FillWeight = 65F;
-            colCantProducto.HeaderText = "Cantidad";
-            colCantProducto.MinimumWidth = 6;
-            colCantProducto.Name = "colCantProducto";
-            colCantProducto.ReadOnly = true;
+            lblCategorias.Dock = DockStyle.Top;
+            lblCategorias.ForeColor = Color.FromArgb(30, 30, 30);
+            lblCategorias.Location = new Point(20, 20);
+            lblCategorias.Name = "lblCategorias";
+            lblCategorias.Size = new Size(330, 28);
+            lblCategorias.TabIndex = 0;
+            lblCategorias.Text = "Categorías";
+            lblCategorias.TextAlign = ContentAlignment.TopLeft;
             // 
-            // colObservacion
+            // dgvCategorias
             // 
-            colObservacion.DataPropertyName = "Observacion";
-            colObservacion.FillWeight = 160F;
-            colObservacion.HeaderText = "Observación";
-            colObservacion.MinimumWidth = 90;
-            colObservacion.Name = "colObservacion";
-            colObservacion.ReadOnly = true;
+            dgvCategorias.AllowUserToAddRows = false;
+            dgvCategorias.AllowUserToDeleteRows = false;
+            dgvCategorias.AllowUserToResizeRows = false;
+            dgvCategorias.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            dgvCategorias.BackgroundColor = Color.White;
+            dgvCategorias.BorderStyle = BorderStyle.None;
+            dgvCategorias.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal;
+            dgvCategorias.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = Color.FromArgb(24, 30, 54);
+            dataGridViewCellStyle4.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle4.ForeColor = Color.White;
+            dataGridViewCellStyle4.Padding = new Padding(5, 0, 0, 0);
+            dataGridViewCellStyle4.SelectionBackColor = Color.FromArgb(24, 30, 54);
+            dataGridViewCellStyle4.SelectionForeColor = Color.White;
+            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.True;
+            dgvCategorias.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dgvCategorias.ColumnHeadersHeight = 40;
+            dgvCategorias.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            dgvCategorias.Columns.AddRange(new DataGridViewColumn[] { colCategoriaId, colCategoria, colProductos, colExistenciaTotal });
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = Color.White;
+            dataGridViewCellStyle5.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle5.ForeColor = Color.FromArgb(30, 30, 30);
+            dataGridViewCellStyle5.Padding = new Padding(5, 0, 0, 0);
+            dataGridViewCellStyle5.SelectionBackColor = Color.FromArgb(46, 51, 73);
+            dataGridViewCellStyle5.SelectionForeColor = Color.White;
+            dataGridViewCellStyle5.WrapMode = DataGridViewTriState.False;
+            dgvCategorias.DefaultCellStyle = dataGridViewCellStyle5;
+            dgvCategorias.Dock = DockStyle.Fill;
+            dgvCategorias.EnableHeadersVisualStyles = false;
+            dgvCategorias.GridColor = Color.FromArgb(230, 235, 240);
+            dgvCategorias.Location = new Point(20, 48);
+            dgvCategorias.MultiSelect = false;
+            dgvCategorias.Name = "dgvCategorias";
+            dgvCategorias.ReadOnly = true;
+            dgvCategorias.RowHeadersVisible = false;
+            dgvCategorias.RowHeadersWidth = 51;
+            dgvCategorias.RowTemplate.Height = 32;
+            dgvCategorias.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            dgvCategorias.Size = new Size(330, 445);
+            dgvCategorias.TabIndex = 1;
+            dgvCategorias.DataBindingComplete += dgvCategorias_DataBindingComplete;
+            dgvCategorias.CellClick += dgvCategorias_CellClick;
+            dgvCategorias.SelectionChanged += dgvCategorias_SelectionChanged;
             // 
-            // colEstado
+            // colCategoriaId
             // 
-            colEstado.DataPropertyName = "Estado";
-            colEstado.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
-            colEstado.FillWeight = 70F;
-            colEstado.HeaderText = "Estado";
-            colEstado.MinimumWidth = 6;
-            colEstado.Name = "colEstado";
-            colEstado.ReadOnly = true;
+            colCategoriaId.DataPropertyName = "CategoriaId";
+            colCategoriaId.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+            colCategoriaId.FillWeight = 40F;
+            colCategoriaId.HeaderText = "Código";
+            colCategoriaId.MinimumWidth = 6;
+            colCategoriaId.Name = "colCategoriaId";
+            colCategoriaId.ReadOnly = true;
+            colCategoriaId.Visible = false;
+            // 
+            // colCategoria
+            // 
+            colCategoria.DataPropertyName = "Categoria";
+            colCategoria.FillWeight = 150F;
+            colCategoria.HeaderText = "Categoría";
+            colCategoria.MinimumWidth = 90;
+            colCategoria.Name = "colCategoria";
+            colCategoria.ReadOnly = true;
+            // 
+            // colProductos
+            // 
+            colProductos.DataPropertyName = "Productos";
+            colProductos.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+            colProductos.FillWeight = 60F;
+            colProductos.HeaderText = "Productos";
+            colProductos.MinimumWidth = 6;
+            colProductos.Name = "colProductos";
+            colProductos.ReadOnly = true;
+            // 
+            // colExistenciaTotal
+            // 
+            colExistenciaTotal.DataPropertyName = "Existencia";
+            colExistenciaTotal.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+            colExistenciaTotal.FillWeight = 60F;
+            colExistenciaTotal.HeaderText = "Existencia";
+            colExistenciaTotal.MinimumWidth = 6;
+            colExistenciaTotal.Name = "colExistenciaTotal";
+            colExistenciaTotal.ReadOnly = true;
+            // 
+            // lblProductos
+            // 
+            lblProductos.Dock = DockStyle.Top;
+            lblProductos.ForeColor = Color.FromArgb(30, 30, 30);
+            lblProductos.Location = new Point(10, 20);
+            lblProductos.Name = "lblProductos";
+            lblProductos.Size = new Size(692, 28);
+            lblProductos.TabIndex = 2;
+            lblProductos.Text = "Selecciona una categoría para ver sus productos";
+            lblProductos.TextAlign = ContentAlignment.TopLeft;
             // 
             // FrmControlInventario
             // 
@@ -430,8 +381,8 @@
             panelDatos.ResumeLayout(false);
             panelDatos.PerformLayout();
             panelContenido.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)nudCantProducto).EndInit();
-            ((System.ComponentModel.ISupportInitialize)dgvControlInventario).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dgvCategorias).EndInit();
+            ((System.ComponentModel.ISupportInitialize)dgvProductos).EndInit();
             ResumeLayout(false);
         }
 
@@ -444,26 +395,19 @@
         private Panel panelInferior;
         private Label lblEstado;
         private Panel panelDatos;
-        private Label lblUsuario;
-        private ComboBox cboUsuario;
-        private Label lblFechaHora;
-        private DateTimePicker dtpFechaHora;
-        private Label lblCantProducto;
-        private NumericUpDown nudCantProducto;
-        private Label lblEstadoRegistro;
-        private ComboBox cboEstado;
-        private Label lblObservacion;
-        private TextBox txtObservacion;
-        private Button btnAgregar;
-        private Button btnLimpiar;
-        private Button btnEliminar;
         private Panel panelContenido;
-        private DataGridView dgvControlInventario;
+        private DataGridView dgvProductos;
         private DataGridViewTextBoxColumn colCodigo;
-        private DataGridViewTextBoxColumn colFechaHora;
-        private DataGridViewTextBoxColumn colUsuario;
-        private DataGridViewTextBoxColumn colCantProducto;
-        private DataGridViewTextBoxColumn colObservacion;
-        private DataGridViewTextBoxColumn colEstado;
+        private DataGridViewTextBoxColumn colProducto;
+        private DataGridViewTextBoxColumn colCodigoBarras;
+        private DataGridViewTextBoxColumn colPrecio;
+        private DataGridViewTextBoxColumn colExistencia;
+        private Label lblCategorias;
+        private DataGridView dgvCategorias;
+        private DataGridViewTextBoxColumn colCategoriaId;
+        private DataGridViewTextBoxColumn colCategoria;
+        private DataGridViewTextBoxColumn colProductos;
+        private DataGridViewTextBoxColumn colExistenciaTotal;
+        private Label lblProductos;
     }
 }
