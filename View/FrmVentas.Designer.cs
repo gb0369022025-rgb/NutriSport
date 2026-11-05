@@ -57,6 +57,7 @@
             btnAgregar = new Button();
             btnLimpiar = new Button();
             btnEliminar = new Button();
+            btnImprimirTicket = new Button();
             panelContenido = new Panel();
             panelDetalle = new Panel();
             lblDetalle = new Label();
@@ -155,6 +156,7 @@
             // 
             // panelDatos
             // 
+            panelDatos.Controls.Add(btnImprimirTicket);
             panelDatos.Controls.Add(btnEliminar);
             panelDatos.Controls.Add(btnLimpiar);
             panelDatos.Controls.Add(btnAgregar);
@@ -331,6 +333,19 @@
             btnEliminar.Text = "Eliminar";
             btnEliminar.UseVisualStyleBackColor = false;
             btnEliminar.Click += btnEliminar_Click;
+            // 
+            // btnImprimirTicket
+            // 
+            btnImprimirTicket.BackColor = Color.FromArgb(230, 235, 240);
+            btnImprimirTicket.Enabled = false;
+            btnImprimirTicket.FlatStyle = FlatStyle.Flat;
+            btnImprimirTicket.Location = new Point(185, 428);
+            btnImprimirTicket.Name = "btnImprimirTicket";
+            btnImprimirTicket.Size = new Size(155, 38);
+            btnImprimirTicket.TabIndex = 15;
+            btnImprimirTicket.Text = "Imprimir ticket";
+            btnImprimirTicket.UseVisualStyleBackColor = false;
+            btnImprimirTicket.Click += btnImprimirTicket_Click;
             // 
             // panelContenido
             // 
@@ -656,6 +671,7 @@
         private Button btnAgregar;
         private Button btnLimpiar;
         private Button btnEliminar;
+        private Button btnImprimirTicket;
         private Panel panelContenido;
         private Panel panelDetalle;
         private Label lblDetalle;

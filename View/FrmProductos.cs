@@ -11,6 +11,7 @@ namespace View
         private const string Titulo = "Productos";
         private string productoSeleccionado = string.Empty;
         private short productoIdSeleccionado = 0;
+        private List<Categoria> categorias = new List<Categoria>();
 
         public FrmProductos()
         {
@@ -28,7 +29,8 @@ namespace View
                 await Task.WhenAll(tareaCategorias, tareaProductos);
                 if (IsDisposed) return;
 
-                cboCategoria.DataSource = tareaCategorias.Result;
+                categorias = tareaCategorias.Result;
+                cboCategoria.DataSource = categorias;
                 cboCategoria.DisplayMember = nameof(Categoria.NombreCategoria);
                 cboCategoria.ValueMember = nameof(Categoria.CategoriaId);
                 MostrarProductos(tareaProductos.Result, string.Empty);
@@ -392,6 +394,14 @@ namespace View
             btnModificar.Enabled = true;
             productoSeleccionado = $"el producto \"{producto.NombreProducto}\"";
             btnEliminar.Enabled = true;
+        }
+
+        private void dgvProductos_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (e.ColumnIndex != colCategoria.Index || e.Value == null || e.Value == DBNull.Value) return;
+            int id = Convert.ToInt32(e.Value);
+            e.Value = categorias.FirstOrDefault(c => c.CategoriaId == id)?.NombreCategoria ?? id.ToString();
+            e.FormattingApplied = true;
         }
 
         private void dgvProductos_DataBindingComplete(object sender, DataGridViewBindingCompleteEventArgs e)

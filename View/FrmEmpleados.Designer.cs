@@ -50,9 +50,9 @@
             lblDireccion = new Label();
             txtDireccion = new TextBox();
             lblRolId = new Label();
-            nudRolId = new NumericUpDown();
+            cboRol = new ComboBox();
             lblCargoId = new Label();
-            nudCargoId = new NumericUpDown();
+            cboCargo = new ComboBox();
             btnAgregar = new Button();
             btnLimpiar = new Button();
             btnEliminar = new Button();
@@ -71,8 +71,6 @@
             panelInferior.SuspendLayout();
             panelDatos.SuspendLayout();
             panelContenido.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)nudRolId).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)nudCargoId).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dgvEmpleados).BeginInit();
             SuspendLayout();
             // 
@@ -149,9 +147,9 @@
             panelDatos.Controls.Add(btnLimpiar);
             panelDatos.Controls.Add(btnAgregar);
             panelDatos.Controls.Add(lblCargoId);
-            panelDatos.Controls.Add(nudCargoId);
+            panelDatos.Controls.Add(cboCargo);
             panelDatos.Controls.Add(lblRolId);
-            panelDatos.Controls.Add(nudRolId);
+            panelDatos.Controls.Add(cboRol);
             panelDatos.Controls.Add(lblDireccion);
             panelDatos.Controls.Add(txtDireccion);
             panelDatos.Controls.Add(lblEmail);
@@ -286,17 +284,16 @@
             lblRolId.Name = "lblRolId";
             lblRolId.Size = new Size(95, 20);
             lblRolId.TabIndex = 12;
-            lblRolId.Text = "Rol (código)";
+            lblRolId.Text = "Rol";
             // 
-            // nudRolId
+            // cboRol
             // 
-            nudRolId.Location = new Point(20, 357);
-            nudRolId.Maximum = new decimal(new int[] { 32767, 0, 0, 0 });
-            nudRolId.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            nudRolId.Name = "nudRolId";
-            nudRolId.Size = new Size(155, 27);
-            nudRolId.TabIndex = 13;
-            nudRolId.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            cboRol.DropDownStyle = ComboBoxStyle.DropDownList;
+            cboRol.FormattingEnabled = true;
+            cboRol.Location = new Point(20, 357);
+            cboRol.Name = "cboRol";
+            cboRol.Size = new Size(155, 28);
+            cboRol.TabIndex = 13;
             // 
             // lblCargoId
             // 
@@ -306,17 +303,16 @@
             lblCargoId.Name = "lblCargoId";
             lblCargoId.Size = new Size(110, 20);
             lblCargoId.TabIndex = 14;
-            lblCargoId.Text = "Cargo (código)";
+            lblCargoId.Text = "Cargo";
             // 
-            // nudCargoId
+            // cboCargo
             // 
-            nudCargoId.Location = new Point(185, 357);
-            nudCargoId.Maximum = new decimal(new int[] { 32767, 0, 0, 0 });
-            nudCargoId.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
-            nudCargoId.Name = "nudCargoId";
-            nudCargoId.Size = new Size(155, 27);
-            nudCargoId.TabIndex = 15;
-            nudCargoId.Value = new decimal(new int[] { 1, 0, 0, 0 });
+            cboCargo.DropDownStyle = ComboBoxStyle.DropDownList;
+            cboCargo.FormattingEnabled = true;
+            cboCargo.Location = new Point(185, 357);
+            cboCargo.Name = "cboCargo";
+            cboCargo.Size = new Size(155, 28);
+            cboCargo.TabIndex = 15;
             // 
             // btnAgregar
             // 
@@ -412,6 +408,7 @@
             dgvEmpleados.Size = new Size(692, 473);
             dgvEmpleados.TabIndex = 19;
             dgvEmpleados.CellClick += dgvEmpleados_CellClick;
+            dgvEmpleados.CellFormatting += dgvEmpleados_CellFormatting;
             dgvEmpleados.DataBindingComplete += dgvEmpleados_DataBindingComplete;
             // 
             // colCodigo
@@ -521,8 +518,6 @@
             panelDatos.ResumeLayout(false);
             panelDatos.PerformLayout();
             panelContenido.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)nudRolId).EndInit();
-            ((System.ComponentModel.ISupportInitialize)nudCargoId).EndInit();
             ((System.ComponentModel.ISupportInitialize)dgvEmpleados).EndInit();
             ResumeLayout(false);
         }
@@ -549,9 +544,9 @@
         private Label lblDireccion;
         private TextBox txtDireccion;
         private Label lblRolId;
-        private NumericUpDown nudRolId;
+        private ComboBox cboRol;
         private Label lblCargoId;
-        private NumericUpDown nudCargoId;
+        private ComboBox cboCargo;
         private Button btnAgregar;
         private Button btnLimpiar;
         private Button btnEliminar;

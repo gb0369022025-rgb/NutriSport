@@ -9,6 +9,7 @@ namespace View
     {
         private const int StockMinimo = 10;
         private bool primeraCarga = true;
+        private string vendedor = string.Empty;
 
         public NutriSport()
         {
@@ -41,6 +42,7 @@ namespace View
                 ? $"{usuario.Nombre} ({usuario.Tipo})"
                 : $"{usuario.NombreEmpleado} ({usuario.Tipo})";
             lblUsuario.Left = panelSuperior.ClientSize.Width - lblUsuario.PreferredWidth - 20;
+            vendedor = string.IsNullOrWhiteSpace(usuario.NombreEmpleado) ? usuario.Nombre : usuario.NombreEmpleado.Trim();
             Text = $"NutriSport - Sistema de Gestión - {usuario.Nombre}";
         }
 
@@ -127,7 +129,7 @@ namespace View
 
         private async void button1_Click(object sender, EventArgs e)
         {
-            await AbrirFormularioAsync(new FrmVentas());
+            await AbrirFormularioAsync(new FrmVentas { Vendedor = vendedor });
         }
 
         private async void button2_Click(object sender, EventArgs e)
@@ -157,7 +159,7 @@ namespace View
 
         private async void btnVentas_Click(object sender, EventArgs e)
         {
-            await AbrirFormularioAsync(new FrmVentas());
+            await AbrirFormularioAsync(new FrmVentas { Vendedor = vendedor });
         }
 
         private async void btnPedidos_Click(object sender, EventArgs e)

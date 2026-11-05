@@ -64,6 +64,7 @@
             colCodigoBarras = new DataGridViewTextBoxColumn();
             colPrecio = new DataGridViewTextBoxColumn();
             colExistencia = new DataGridViewTextBoxColumn();
+            colCategoria = new DataGridViewTextBoxColumn();
             panelSuperior.SuspendLayout();
             panelInferior.SuspendLayout();
             panelDatos.SuspendLayout();
@@ -399,7 +400,7 @@
             dgvProductos.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             dgvProductos.ColumnHeadersHeight = 40;
             dgvProductos.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            dgvProductos.Columns.AddRange(new DataGridViewColumn[] { colCodigo, colProducto, colCodigoBarras, colPrecio, colExistencia });
+            dgvProductos.Columns.AddRange(new DataGridViewColumn[] { colCodigo, colProducto, colCategoria, colCodigoBarras, colPrecio, colExistencia });
             dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle2.BackColor = Color.White;
             dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
@@ -423,6 +424,7 @@
             dgvProductos.Size = new Size(692, 393);
             dgvProductos.TabIndex = 19;
             dgvProductos.CellClick += dgvProductos_CellClick;
+            dgvProductos.CellFormatting += dgvProductos_CellFormatting;
             dgvProductos.DataBindingComplete += dgvProductos_DataBindingComplete;
             // 
             // colCodigo
@@ -443,6 +445,15 @@
             colProducto.MinimumWidth = 90;
             colProducto.Name = "colProducto";
             colProducto.ReadOnly = true;
+            // 
+            // colCategoria
+            // 
+            colCategoria.DataPropertyName = "CategoriaId";
+            colCategoria.FillWeight = 120F;
+            colCategoria.HeaderText = "Categoría";
+            colCategoria.MinimumWidth = 90;
+            colCategoria.Name = "colCategoria";
+            colCategoria.ReadOnly = true;
             // 
             // colCodigoBarras
             // 
@@ -542,5 +553,6 @@
         private DataGridViewTextBoxColumn colCodigoBarras;
         private DataGridViewTextBoxColumn colPrecio;
         private DataGridViewTextBoxColumn colExistencia;
+        private DataGridViewTextBoxColumn colCategoria;
     }
 }

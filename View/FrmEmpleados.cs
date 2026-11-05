@@ -1,5 +1,7 @@
 ﻿using Entities;
 using NutriSport.BL;
+using NutriSport.DAL;
+using NutriSport.Entities;
 
 namespace View
 {
@@ -8,6 +10,8 @@ namespace View
         private const string Titulo = "Empleados";
         private int empleadoIdSeleccionado = 0;
         private string empleadoSeleccionado = string.Empty;
+        private List<Rol> roles = new List<Rol>();
+        private List<Cargo> cargos = new List<Cargo>();
 
         public FrmEmpleados()
         {
@@ -17,6 +21,34 @@ namespace View
 
         private async void FrmEmpleados_Load(object sender, EventArgs e)
         {
+            MostrarOcupado(true, "Cargando roles y cargos...");
+            try
+            {
+                Task<List<Rol>> tareaRoles = EnSegundoPlano(() => Rol_DAL.ObtenerTodos());
+                Task<List<Cargo>> tareaCargos = EnSegundoPlano(() => Cargo_DAL.ObtenerTodos());
+                await Task.WhenAll(tareaRoles, tareaCargos);
+                if (IsDisposed) return;
+
+                roles = tareaRoles.Result;
+                cargos = tareaCargos.Result;
+                cboRol.DataSource = roles;
+                cboRol.DisplayMember = nameof(Rol.Nombre);
+                cboRol.ValueMember = nameof(Rol.RolId);
+                cboCargo.DataSource = cargos;
+                cboCargo.DisplayMember = nameof(Cargo.Nombre);
+                cboCargo.ValueMember = nameof(Cargo.CargoId);
+            }
+            catch (Exception ex)
+            {
+                if (IsDisposed) return;
+                MessageBox.Show("No se pudieron cargar los roles y cargos. Revisa la conexión con la base de datos.\n\nDetalle: " + ex.Message,
+                    Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (!IsDisposed) MostrarOcupado(false);
+            }
+            if (IsDisposed) return;
             await CargarEmpleadosAsync();
             LimpiarCampos();
         }
@@ -87,7 +119,25 @@ namespace View
                     return false;
                 }
             }
+            if (cboRol.SelectedValue == null)
+            {
+                MessageBox.Show("Selecciona el rol del empleado.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cboRol.Focus();
+                return false;
+            }
+            if (cboCargo.SelectedValue == null)
+            {
+                MessageBox.Show("Selecciona el cargo del empleado.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cboCargo.Focus();
+                return false;
+            }
             return true;
+        }
+
+        private static void VaciarSeleccion(ComboBox combo)
+        {
+            combo.SelectedIndex = -1;
+            combo.SelectedIndex = -1;
         }
 
         private void LimpiarCampos()
@@ -100,8 +150,8 @@ namespace View
             txtDUI.Clear();
             txtEmail.Clear();
             txtDireccion.Clear();
-            nudRolId.Value = nudRolId.Minimum;
-            nudCargoId.Value = nudCargoId.Minimum;
+            VaciarSeleccion(cboRol);
+            VaciarSeleccion(cboCargo);
             dgvEmpleados.ClearSelection();
             txtNombre.Focus();
         }
@@ -118,8 +168,8 @@ namespace View
                 DUI = txtDUI.Text.Trim(),
                 Email = txtEmail.Text.Trim(),
                 Direccion = txtDireccion.Text.Trim(),
-                RolId = (short)nudRolId.Value,
-                CargoId = (short)nudCargoId.Value
+                RolId = Convert.ToInt16(cboRol.SelectedValue),
+                CargoId = Convert.ToInt16(cboCargo.SelectedValue)
             };
             MostrarOcupado(true, "Guardando...");
             try
@@ -140,7 +190,7 @@ namespace View
             catch (Exception ex)
             {
                 if (IsDisposed) return;
-                MessageBox.Show("No se pudo agregar el empleado. Revisa que los códigos de rol y cargo existan.\n\nDetalle: " + ex.Message,
+                MessageBox.Show("No se pudo agregar el empleado.\n\nDetalle: " + ex.Message,
                     Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
@@ -191,6 +241,23 @@ namespace View
         private void btnLimpiar_Click(object sender, EventArgs e)
         {
             LimpiarCampos();
+        }
+
+        private void dgvEmpleados_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            if (e.Value == null || e.Value == DBNull.Value) return;
+            if (e.ColumnIndex == colRolId.Index)
+            {
+                short id = Convert.ToInt16(e.Value);
+                e.Value = roles.FirstOrDefault(r => r.RolId == id)?.Nombre ?? id.ToString();
+                e.FormattingApplied = true;
+            }
+            else if (e.ColumnIndex == colCargoId.Index)
+            {
+                short id = Convert.ToInt16(e.Value);
+                e.Value = cargos.FirstOrDefault(c => c.CargoId == id)?.Nombre ?? id.ToString();
+                e.FormattingApplied = true;
+            }
         }
 
         private void dgvEmpleados_CellClick(object sender, DataGridViewCellEventArgs e)

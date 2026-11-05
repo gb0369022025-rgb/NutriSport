@@ -1,4 +1,6 @@
-﻿using Entities;
+﻿using System.Drawing.Drawing2D;
+using System.Drawing.Printing;
+using Entities;
 using NutriSport.BL;
 using NutriSport.Entities;
 
@@ -11,6 +13,19 @@ namespace View
         private string ventaSeleccionado = string.Empty;
         private List<Cliente> clientes = new List<Cliente>();
         private readonly SemaphoreSlim escaneo = new SemaphoreSlim(1, 1);
+        private const string EmpresaNombre = "NutriSport El Salvador S.A. de C.V.";
+        private const string EmpresaGiro = "Venta de Ropa, Calzado Deportivo y Suplementos";
+        private const string EmpresaDireccion = "Bulevar de Los Héroes #125, San Salvador";
+        private const string EmpresaTelefono = "2225-7000";
+        private const string EmpresaCnr = "198234-5";
+        private int ticketVenta;
+        private DateTime ticketFecha;
+        private string ticketCliente = string.Empty;
+        private string ticketDui = string.Empty;
+        private List<(string Producto, int Cantidad, decimal Precio, decimal Total)> ticketLineas = new List<(string Producto, int Cantidad, decimal Precio, decimal Total)>();
+        private decimal ticketTotal;
+
+        public string Vendedor { get; set; } = string.Empty;
 
         public FrmVentas()
         {
@@ -271,13 +286,30 @@ namespace View
                 })
                 .ToList();
             decimal total = TotalVenta();
+            string cliente = cboCliente.Text;
+            int clienteId = Convert.ToInt32(cboCliente.SelectedValue);
+            string dui = clientes.FirstOrDefault(c => c.ClienteId == clienteId)?.DUI ?? string.Empty;
+            var lineas = dgvDetalle.Rows.Cast<DataGridViewRow>()
+                .Select(r => (Producto: Convert.ToString(r.Cells[colDetProducto.Index].Value) ?? string.Empty,
+                              Cantidad: Convert.ToInt32(r.Cells[colDetCantidad.Index].Value),
+                              Precio: Convert.ToDecimal(r.Cells[colDetPrecio.Index].Value),
+                              Total: Convert.ToDecimal(r.Cells[colDetTotal.Index].Value)))
+                .ToList();
 
             MostrarOcupado(true, "Registrando venta...");
             try
             {
                 int idVenta = await EnSegundoPlano(() => Venta_BL.Registrar(venta, detalle));
                 if (IsDisposed) return;
-                MessageBox.Show($"Venta N° {idVenta} registrada por {total:$#,##0.00}.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ticketVenta = idVenta;
+                ticketFecha = DateTime.Now;
+                ticketCliente = cliente;
+                ticketDui = dui;
+                ticketLineas = lineas;
+                ticketTotal = total;
+                btnImprimirTicket.Enabled = true;
+                MessageBox.Show($"Venta N° {idVenta} registrada por {total:$#,##0.00}. Se imprimirá el ticket.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ImprimirTicket();
                 await CargarVentasAsync();
                 LimpiarCampos();
             }
@@ -291,6 +323,114 @@ namespace View
             {
                 if (!IsDisposed) MostrarOcupado(false);
             }
+        }
+
+        private void ImprimirTicket()
+        {
+            try
+            {
+                using PrintDocument documento = CrearTicket();
+                documento.PrintController = new StandardPrintController();
+                documento.Print();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("La venta se registró, pero no se pudo imprimir el ticket. Revisa que la impresora esté encendida y conectada, y usa Imprimir ticket.\n\nDetalle: " + ex.Message,
+                    Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
+        private void btnImprimirTicket_Click(object sender, EventArgs e)
+        {
+            if (ticketVenta == 0) return;
+            using PrintDocument documento = CrearTicket();
+            using var vistaPrevia = new PrintPreviewDialog { Document = documento, Icon = Icon, Width = 520, Height = 760 };
+            vistaPrevia.ShowDialog(this);
+        }
+
+        private PrintDocument CrearTicket()
+        {
+            var documento = new PrintDocument { DocumentName = $"Factura {ticketVenta:D6}" };
+            documento.PrintPage += (s, ev) =>
+            {
+                Graphics g = ev.Graphics!;
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                float x = 10;
+                float y = 10;
+                float ancho = Math.Min(ev.PageBounds.Width - 20, 280);
+                using var fuenteTitulo = new Font("Segoe UI", 10F, FontStyle.Bold);
+                using var fuente = new Font("Segoe UI", 8F);
+                using var fuenteNegrita = new Font("Segoe UI", 8F, FontStyle.Bold);
+                using var fuenteTotal = new Font("Segoe UI", 11F, FontStyle.Bold);
+                using var centrado = new StringFormat { Alignment = StringAlignment.Center };
+                using var derecha = new StringFormat { Alignment = StringAlignment.Far };
+                using var separador = new Pen(Color.Black) { DashStyle = DashStyle.Dash };
+                float alto = fuente.GetHeight(g);
+
+                void Texto(string texto, Font letra, StringFormat? formato = null)
+                {
+                    SizeF tam = g.MeasureString(texto, letra, (int)ancho);
+                    g.DrawString(texto, letra, Brushes.Black, new RectangleF(x, y, ancho, tam.Height), formato ?? StringFormat.GenericDefault);
+                    y += tam.Height;
+                }
+
+                void Fila(string izquierda, string valor, Font letra)
+                {
+                    float altoFila = letra.GetHeight(g);
+                    g.DrawString(izquierda, letra, Brushes.Black, x, y);
+                    g.DrawString(valor, letra, Brushes.Black, new RectangleF(x, y, ancho, altoFila), derecha);
+                    y += altoFila;
+                }
+
+                void Separador()
+                {
+                    y += 4;
+                    g.DrawLine(separador, x, y, x + ancho, y);
+                    y += 6;
+                }
+
+                using (Stream? recurso = typeof(Program).Assembly.GetManifestResourceStream("logo.png"))
+                {
+                    if (recurso != null)
+                    {
+                        using Image logo = Image.FromStream(recurso);
+                        g.DrawImage(logo, x + (ancho - 45) / 2, y, 45, 45);
+                        y += 50;
+                    }
+                }
+                Texto(EmpresaNombre, fuenteTitulo, centrado);
+                Texto(EmpresaGiro, fuente, centrado);
+                Texto(EmpresaDireccion, fuente, centrado);
+                Texto($"Tel.: {EmpresaTelefono}   CNR: {EmpresaCnr}", fuente, centrado);
+                Separador();
+                Texto("FACTURA DE VENTA", fuenteNegrita, centrado);
+                Fila("Factura N°:", ticketVenta.ToString("D6"), fuente);
+                Fila("Fecha:", ticketFecha.ToString("dd/MM/yyyy"), fuente);
+                Fila("Hora:", ticketFecha.ToString("HH:mm"), fuente);
+                if (Vendedor.Length > 0) Fila("Atendió:", Vendedor, fuente);
+                Texto($"Cliente: {ticketCliente}", fuente);
+                if (ticketDui.Length > 0) Texto($"DUI: {ticketDui}", fuente);
+                Separador();
+                Fila("Cant. x Precio", "Total", fuenteNegrita);
+                y += 2;
+                foreach (var linea in ticketLineas)
+                {
+                    Texto(linea.Producto, fuente);
+                    Fila($"  {linea.Cantidad} x {linea.Precio:$#,##0.00}", linea.Total.ToString("$#,##0.00"), fuente);
+                    y += 3;
+                }
+                Separador();
+                decimal subtotal = Math.Round(ticketTotal / 1.13m, 2);
+                Fila($"Artículos: {ticketLineas.Sum(l => l.Cantidad)}", string.Empty, fuente);
+                Fila("Subtotal sin IVA:", subtotal.ToString("$#,##0.00"), fuente);
+                Fila("IVA (13%):", (ticketTotal - subtotal).ToString("$#,##0.00"), fuente);
+                y += 2;
+                Fila("TOTAL:", ticketTotal.ToString("$#,##0.00"), fuenteTotal);
+                Separador();
+                Texto("¡Gracias por su compra!", fuenteNegrita, centrado);
+                Texto("Conserve este comprobante", fuente, centrado);
+            };
+            return documento;
         }
 
         private async void btnEliminar_Click(object sender, EventArgs e)
