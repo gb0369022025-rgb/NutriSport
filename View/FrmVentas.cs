@@ -205,6 +205,7 @@ namespace View
         private void ActualizarTotal()
         {
             lblTotal.Text = $"Total: {TotalVenta():$#,##0.00}";
+            btnImprimirTicket.Enabled = dgvDetalle.Rows.Count > 0 || ticketVenta != 0;
         }
 
         private void btnQuitarProducto_Click(object sender, EventArgs e)
@@ -268,6 +269,23 @@ namespace View
 
         private async void btnAgregar_Click(object sender, EventArgs e)
         {
+            await RegistrarVentaAsync(false);
+        }
+
+        private async void btnImprimirTicket_Click(object sender, EventArgs e)
+        {
+            if (dgvDetalle.Rows.Count > 0)
+            {
+                await RegistrarVentaAsync(true);
+            }
+            else if (ticketVenta != 0)
+            {
+                MostrarTicket();
+            }
+        }
+
+        private async Task RegistrarVentaAsync(bool imprimirTicket)
+        {
             if (!ValidarCampos()) return;
 
             dtpFecha.Value = DateTime.Today;
@@ -296,55 +314,59 @@ namespace View
                               Total: Convert.ToDecimal(r.Cells[colDetTotal.Index].Value)))
                 .ToList();
 
+            int idVenta;
             MostrarOcupado(true, "Registrando venta...");
             try
             {
-                int idVenta = await EnSegundoPlano(() => Venta_BL.Registrar(venta, detalle));
-                if (IsDisposed) return;
-                ticketVenta = idVenta;
-                ticketFecha = DateTime.Now;
-                ticketCliente = cliente;
-                ticketDui = dui;
-                ticketLineas = lineas;
-                ticketTotal = total;
-                btnImprimirTicket.Enabled = true;
-                MessageBox.Show($"Venta N° {idVenta} registrada por {total:$#,##0.00}. Se imprimirá el ticket.", Titulo, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                ImprimirTicket();
-                await CargarVentasAsync();
-                LimpiarCampos();
+                idVenta = await EnSegundoPlano(() => Venta_BL.Registrar(venta, detalle));
             }
             catch (Exception ex)
             {
                 if (IsDisposed) return;
                 MessageBox.Show("No se pudo registrar la venta. Si algún producto ya no tiene existencia suficiente, la venta no se guarda.\n\nDetalle: " + ex.Message,
                     Titulo, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
             finally
             {
                 if (!IsDisposed) MostrarOcupado(false);
             }
+            if (IsDisposed) return;
+
+            ticketVenta = idVenta;
+            ticketFecha = DateTime.Now;
+            ticketCliente = cliente;
+            ticketDui = dui;
+            ticketLineas = lineas;
+            ticketTotal = total;
+
+            if (imprimirTicket)
+            {
+                MostrarTicket();
+            }
+            else if (MessageBox.Show($"Venta N° {idVenta} registrada por {total:$#,##0.00}.\n\n¿Deseas imprimir el ticket?",
+                         Titulo, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                MostrarTicket();
+            }
+
+            await CargarVentasAsync();
+            LimpiarCampos();
         }
 
-        private void ImprimirTicket()
+        private void MostrarTicket()
         {
-            try
-            {
-                using PrintDocument documento = CrearTicket();
-                documento.PrintController = new StandardPrintController();
-                documento.Print();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("La venta se registró, pero no se pudo imprimir el ticket. Revisa que la impresora esté encendida y conectada, y usa Imprimir ticket.\n\nDetalle: " + ex.Message,
-                    Titulo, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-        }
-
-        private void btnImprimirTicket_Click(object sender, EventArgs e)
-        {
-            if (ticketVenta == 0) return;
             using PrintDocument documento = CrearTicket();
-            using var vistaPrevia = new PrintPreviewDialog { Document = documento, Icon = Icon, Width = 520, Height = 760 };
+            using var vistaPrevia = new PrintPreviewDialog
+            {
+                Document = documento,
+                Icon = Icon,
+                Text = $"Ticket - Factura {ticketVenta:D6}",
+                Width = 520,
+                Height = 760,
+                StartPosition = FormStartPosition.CenterParent
+            };
+            vistaPrevia.PrintPreviewControl.Zoom = 1.0;
             vistaPrevia.ShowDialog(this);
         }
 
